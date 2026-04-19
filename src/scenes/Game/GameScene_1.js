@@ -62,19 +62,29 @@ export class GameScene_1 extends BaseGameScene {
             { x: this.centerX + 800, y: this.centerY + 100 },
         ];
 
-        this.currentIndex = 5;
+        this.spawnPositions_q2 = [
+            { x: this.centerX - 800, y: this.centerY - 200 },
+            { x: this.centerX + 800, y: this.centerY - 200 },
+            { x: this.centerX - 800, y: this.centerY + 200 },
+            { x: this.centerX + 800, y: this.centerY + 200 },
+            { x: this.centerX - 800, y: this.centerY },
+            { x: this.centerX + 800, y: this.centerY }
+        ];
 
+        this.questionOrder = Phaser.Utils.Array.Shuffle([1, 2, 3, 4, 5]).slice(0, 3);
+        console.log('Shuffled question order:', this.questionOrder);
+        this.currentIndex = 0;
 
         // Now call initGame which will call setupGameObjects
         this.initGame('game1_bg', 'game1_description', true, false, {
-            targetRounds: 5,
+            targetRounds: 3,
             roundPerSeconds: 120,
             isAllowRoundFail: false,
             isContinuousTimer: true,
             sceneIndex: 1
         });
 
-        this.gameUI.descriptionPanel.setVisible(false);
+        // this.gameUI.descriptionPanel.setVisible(false);
 
     }
 
@@ -82,8 +92,9 @@ export class GameScene_1 extends BaseGameScene {
         this.input.removeAllListeners('drag');
         this.input.removeAllListeners('dragend');
 
+        const currentQuestionId = this.questionOrder[this.currentIndex];
         this.questionImage = this.add.image(this.centerX,
-            this.centerY + 50, `game1_q${this.currentIndex}`).setDepth(200);
+            this.centerY + 50, `game1_q${currentQuestionId}`).setDepth(200);
 
         this.confirmBtn = new CustomButton(this, this.centerX, this.centerY + 450,
             'game1_confirm_button', 'game1_confirm_button_select', () => {
@@ -110,12 +121,14 @@ export class GameScene_1 extends BaseGameScene {
                 answers: [
                     'game1_q2_correct_answer1',
                     'game1_q2_fail_answer2', 'game1_q2_fail_answer3',
-                    'game1_q2_fail_answer4'
+                    'game1_q2_fail_answer4',
+                    'game1_q2_correct_answer1', 'game1_q2_fail_answer3',
                 ],
                 fillAnswers: [
                     'game1_q2_fill_answer1',
                     'game1_q2_fill_answer2', 'game1_q2_fill_answer3',
-                    'game1_q2_fill_answer4'
+                    'game1_q2_fill_answer4',
+                    'game1_q2_fill_answer1', 'game1_q2_fill_answer3',
                 ]
             },
             {
@@ -188,12 +201,12 @@ export class GameScene_1 extends BaseGameScene {
             {
                 q: 5,
                 fillPositions: [
-                    { x: 1335, y: 575, targetKey: 'game1_q5b_correct_answer1' }
+                    { x: 1335, y: 575, targetKey: 'game1_q5_correct_answer1' }
                 ]
             }
         ];
 
-        const currentFillPositions = this.targetContents[this.currentIndex - 1].fillPositions;
+        const currentFillPositions = this.targetContents.find(c => c.q === currentQuestionId).fillPositions;
 
         // Debug graphics for fill positions
         if (!this.fillDebugGraphics) {
@@ -211,7 +224,7 @@ export class GameScene_1 extends BaseGameScene {
         });
 
         // Build answerKey → fillAnswerKey lookup
-        const choice = this.choices[this.currentIndex - 1];
+        const choice = this.choices.find(c => c.q === currentQuestionId);
         const answerToFillMap = {};
         choice.answers.forEach((key, i) => { answerToFillMap[key] = choice.fillAnswers[i]; });
 
@@ -228,7 +241,8 @@ export class GameScene_1 extends BaseGameScene {
         }));
 
         // Spawn answers at shuffled positions
-        const shuffledPositions = Phaser.Utils.Array.Shuffle([...this.spawnPositions]);
+        const spawnPool = currentQuestionId === 2 ? this.spawnPositions_q2 : this.spawnPositions;
+        const shuffledPositions = Phaser.Utils.Array.Shuffle([...spawnPool]);
         this.answerImages = [];
         choice.answers.forEach((answerKey, index) => {
             const pos = shuffledPositions[index];
@@ -321,13 +335,11 @@ export class GameScene_1 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
-        let isFinalWin = (this.currentIndex == this.targetRounds);
+        let isFinalWin = (this.currentIndex + 1 >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
 
-        // Sync roundIndex with currentIndex for UI updates
-        this.roundIndex = this.currentIndex - 1;
-
         if (isFinalWin) {
+            this.roundIndex = this.currentIndex;
             this.gameTimer.stop();
             this._calculateTiming(isFinalWin);
             this.enableGameInteraction(false);
@@ -335,6 +347,7 @@ export class GameScene_1 extends BaseGameScene {
             this.showBubble('win');
         } else {
             this.currentIndex++;
+            this.roundIndex = this.currentIndex - 1;
             this.resetForNewRound();
         }
         this.updateRoundUI(true);
@@ -355,9 +368,11 @@ export class GameScene_1 extends BaseGameScene {
     }
 
     resetForNewRound() {
-        // Reset currentIndex to 1 on full game restart (restartGame sets gameState to 'init')
+        // Reset currentIndex and shuffle questions on full game restart (restartGame sets gameState to 'init')
         if (this.gameState === 'init') {
-            this.currentIndex = 1;
+            this.currentIndex = 0;
+            this.questionOrder = Phaser.Utils.Array.Shuffle([1, 2, 3, 4, 5]).slice(0, 3);
+            console.log('Shuffled question order:', this.questionOrder);
         }
 
         // Destroy question image
