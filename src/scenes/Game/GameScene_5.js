@@ -16,6 +16,9 @@ export class GameScene_5 extends BaseGameScene {
         this.load.image('game5_npc_box_win', `${path}game5_npc_box4.png`);
         this.load.image('game5_npc_box_tryagain', `${path}game5_npc_box5.png`);
 
+        this.load.video('game_success', `${path}game5_success_bg.mp4`);
+        this.load.video('game_fail', `${path}game5_fail_bg.mp4`);
+
         // UI buttons
         this.load.image('game5_confirm_button', `${path}game5_confirm_button.png`);
         this.load.image('game5_confirm_button_select', `${path}game5_confirm_button_select.png`);
@@ -85,14 +88,64 @@ export class GameScene_5 extends BaseGameScene {
         }
         this.setupGameObjects(); // 重新抽題並建立 Panel
         this.questionPanel.setVisible(true);
+        this.video?.destroy();
     }
 
     showWin() {
         this.questionPanel.setVisible(false);
-        this.time.delayedCall(1500, () => {
-            // GameManager.backToMainStreet(this);
-        });
+
     }
 
+    onRoundWin() {
+        if (!this.isGameActive || this.gameState === 'gameWin') return;
 
+        let isFinalWin = (this.roundIndex + 1 >= this.targetRounds) || this.isAllowRoundFail;
+        this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
+
+        this.gameTimer.stop();
+        this._calculateTiming(isFinalWin);
+        this.enableGameInteraction(false);
+        this.updateRoundUI(true);
+        this.showFeedbackLabel(true);
+
+        this.video = this.add.video(960, 540, 'game_success')
+            .setDepth(560)
+            .setVisible(true);
+        this.video.setMute(false);
+        this.video.play(true);
+
+        this.time.delayedCall(
+            2000, () => {
+                this.showBubble('win', this.playerGender);
+            });
+
+
+    }
+    handleLose() {
+        // Prevent multiple entries
+        if (this.gameState === 'gameLose') return;
+
+        this.currentFailCount = (this.currentFailCount || 0) + 1; // Increment fail count
+
+        // Standard Logic
+        this.isGameActive = false;
+        this.gameState = 'lose';
+
+        this.label = this.add.image(1650, 350, 'game_fail_label').setDepth(555);
+        if (this.gameTimer) this.gameTimer.stop();
+        this.enableGameInteraction(false);
+        this.updateRoundUI(false);
+
+
+        this.video = this.add.video(960, 540, 'game_fail')
+            .setDepth(560)
+            .setVisible(true);
+        this.video.setMute(false);
+        this.video.play(true);
+
+        this.time.delayedCall(
+            2000, () => {
+                this.showBubble('tryagain');
+            });
+    }
 }

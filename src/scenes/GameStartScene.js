@@ -18,9 +18,9 @@ export class GameStartScene extends Phaser.Scene {
         this.bgVideo.setMute(false);
         this.bgVideo.play(true); // loop
 
-        // if (this.sound.getAll('bgm').length === 0) {
-        //     this.sound.play('bgm', { loop: true, volume: 0.5 });
-        // }
+        if (this.sound.getAll('bgm').length === 0) {
+            this.sound.play('bgm', { loop: true, volume: 0.5 });
+        }
 
         const descriptionPages = [
             {
@@ -67,17 +67,20 @@ export class GameStartScene extends Phaser.Scene {
 
         const ui = UIHelper.createCommonUI(this, programPages, descriptionPages, 100);
 
-        // 3. Create the Main "Play" and "Tutorial" buttons for the center of the screen
-        // We use the existing descriptionPanel from 'ui' so we don't duplicate it.
-        const gameDescrBtn = new CustomButton(this, 960, 800, 'cover_game_description_button', 'cover_game_description_button_click', () => {
-            // Sync the top-left description button state if needed
-            if (ui.descBtn) ui.descBtn.setPressedState();
+        const descriptionPanel = new CustomPanel(this, 960, 540, descriptionPages);
+        descriptionPanel.setVisible(false);
+        descriptionPanel.setDepth(200);
 
-            ui.descriptionPanel.setVisible(true);
-            ui.descriptionPanel.currentPage = 0;
-            ui.descriptionPanel.refresh();
-        });
-        gameDescrBtn.needClicked = false; // Normal button behavior
+
+        const gameDescrBtn = new CustomButton(this, 960, 800,
+            'cover_game_description_button',
+            'cover_game_description_button_click', () => {
+                console.log("show game description");
+                descriptionPanel.show();
+                descriptionPanel.currentPage = 0;
+                descriptionPanel.refresh();
+            });
+
 
         const startBtn = new CustomButton(this, 960, 900, 'cover_game_start', 'cover_game_start_click', () => {
             console.log("go to login");

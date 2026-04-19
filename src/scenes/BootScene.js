@@ -10,7 +10,7 @@ export class BootScene extends Phaser.Scene {
         // Load assets for the boot scene
         const gameStartPath = 'assets/images/GameStart/';
 
-        this.load.video('cover_video', gameStartPath + 'cover_bg.webm');
+        this.load.video('cover_video', gameStartPath + 'cover.mp4');
         this.load.image('close_button', gameStartPath + 'close_button.png');
         this.load.image('close_button_click', gameStartPath + 'close_button_click.png');
         // Video/webm not supported by this.load.image
@@ -142,7 +142,7 @@ export class BootScene extends Phaser.Scene {
 
             this.registry.set('globalSettings', settings);
         }
-        this.scene.start('GameScene_5');
+        this.scene.start('GameStartScene');
     }
 }
 

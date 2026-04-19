@@ -1,5 +1,4 @@
 import { CustomButton, CustomButton2 } from './Button.js';
-
 /**
  * BASE PANEL CLASS
  * Provides common functionality for all game overlays
@@ -243,79 +242,113 @@ export class ItemsPanel extends Phaser.GameObjects.Container {
             {
                 itemKey: 'itempage_item1',
                 itemSelectKey: 'itempage_item1_select',
-                itemDescriptionKey: 'game1_object_description'
+                itemDescriptionKey: 'itempage_item1_description'
             },
             {
-                itemKey: 'itempage_item4',
-                itemSelectKey: 'itempage_item4_select',
-                itemDescriptionKey: 'game4_object_description'
+                itemKey: 'itempage_item2',
+                itemSelectKey: 'itempage_item2_select',
+                itemDescriptionKey: 'itempage_item2_description'
             },
 
             {
                 itemKey: 'itempage_item3',
                 itemSelectKey: 'itempage_item3_select',
-                itemDescriptionKey: 'game3_object_description'
+                itemDescriptionKey: 'itempage_item3_description'
             },
             {
-                itemKey: 'itempage_item2',
-                itemSelectKey: 'itempage_item2_select',
-                itemDescriptionKey: 'game2_object_description'
+                itemKey: 'itempage_item4',
+                itemSelectKey: 'itempage_item4_select',
+                itemDescriptionKey: 'itempage_item4_description'
             },
             {
-                itemKey: 'itempage_item_box'
+                itemKey: 'itempage_item5',
+                itemSelectKey: 'itempage_item5_select',
+                itemDescriptionKey: 'itempage_item5_description'
+            },
+            {
+                itemKey: 'itempage_item6',
+                itemSelectKey: 'itempage_item6_select',
+                itemDescriptionKey: 'itempage_item6_description'
+            },
+            {
+                itemKey: 'itempage_item7',
+                itemSelectKey: 'itempage_item7_select',
+                itemDescriptionKey: 'itempage_item7_description'
             }
         ];
+
+        const ROW_SPACING = 250;
+        const COLS = 5;
+        const ROW1_Y = -100;
+        const ROW2_Y = 200;
+        const startX = -((COLS - 1) * ROW_SPACING) / 2; // -500
 
         // 1. 背景層
         this.bg = scene.add.image(0, 0, 'itempage_bg').setDepth(1).setScrollFactor(0);
         this.panelBg = scene.add.image(0, 0, 'itempage_panel_bg').setDepth(2).setScrollFactor(0);
         this.add([this.bg, this.panelBg]);
 
+        // 2. Preset 10 item boxes (5 top + 5 bottom), store refs for texture swap
+        const slots = [];
+        for (let col = 0; col < COLS; col++) {
+            const bx = startX + col * ROW_SPACING;
+            const topBox = scene.add.image(bx, ROW1_Y, 'itempage_item_box').setDepth(3).setScrollFactor(0);
+            const botBox = scene.add.image(bx, ROW2_Y, 'itempage_item_box').setDepth(3).setScrollFactor(0);
+            this.add([topBox, botBox]);
+            slots.push(topBox);  // slots 0-4  → row 1
+            slots.push(botBox);  // slots 5-9  → row 2 (interleaved so slot index = col + row*5 below)
+        }
+        // Reorder: slots[0-4] = top row left→right, slots[5-9] = bottom row left→right
+        const orderedSlots = [
+            slots[0], slots[2], slots[4], slots[6], slots[8],  // top row
+            slots[1], slots[3], slots[5], slots[7], slots[9]   // bottom row
+        ];
+
         // Get game results from localStorage
         const savedGameResultData = localStorage.getItem('allGamesResult');
         const allResults = savedGameResultData ? JSON.parse(savedGameResultData) : [];
 
-        // 2. 產生物品按鈕
+        // 3. For each item, if unlocked swap texture and add click handler
         itemsContent.forEach((item, index) => {
-            const posX = -500 + index * 250; // 調整為 Container 相對座標
-            const posY = -100;
+            const slot = orderedSlots[index];
+            if (!slot) return;
 
-            // Always show the box for Top Row (y=-100) and Bottom Row (y=200)
-            const itemBoxTop = scene.add.image(posX, posY, 'itempage_item_box').setDepth(3).setScrollFactor(0);
-            const itemBoxBottom = scene.add.image(posX, 200, 'itempage_item_box').setDepth(3).setScrollFactor(0);
-            this.add([itemBoxTop, itemBoxBottom]);
-
-            // Check if corresponding game (index + 1) is completed
             const gameId = index + 1;
             const isUnlocked = allResults.find(r => r.game === gameId)?.isFinished;
+            if (!isUnlocked) return;
 
-            if (isUnlocked) {
-                const itemBtn = new CustomButton(scene, posX, posY, item.itemKey, item.itemSelectKey, () => {
-                    const pages = [
-                        item.itemDescriptionKey,
-                        item.itemDescriptionKey1,
-                        item.itemDescriptionKey2
-                    ].filter(key => key != null);
+            // Swap placeholder texture to item image
+            slot.setTexture(item.itemKey).setInteractive({ useHandCursor: true });
 
-                    if (pages.length > 0) {
-                        const blocker = scene.add.rectangle(0, 0, 1920, 1080, 0x000000, 0.5).setInteractive().setScrollFactor(0);
+            slot.on('pointerover', () => slot.setTexture(item.itemSelectKey));
+            slot.on('pointerout', () => slot.setTexture(item.itemKey));
+            slot.on('pointerdown', () => {
+                slot.setTexture(item.itemSelectKey);
+                const pages = [
+                    item.itemDescriptionKey,
+                    item.itemDescriptionKey1,
+                    item.itemDescriptionKey2
+                ].filter(key => key != null).map(key => ({ content: key }));
 
-                        const descPanel = new CustomDescriptionPanel(scene, 0, 0, pages, () => {
-                            blocker.destroy();
-                            this.activeDescPanel = null;
-                            this.activeBlocker = null;
-                        });
+                if (pages.length > 0) {
+                    const blocker = scene.add.rectangle(0, 0, 1920, 1080, 0x000000, 0.5).setInteractive().setScrollFactor(0);
 
-                        descPanel.setDepth(501).setScrollFactor(0);
-                        blocker.setDepth(500).setScrollFactor(0);
+                    const descPanel = new CustomPanel(scene, 0, 0, pages);
+                    descPanel.setCloseCallBack(() => {
+                        slot.setTexture(item.itemKey);
+                        blocker.destroy();
+                        this.activeDescPanel = null;
+                        this.activeBlocker = null;
+                    });
 
-                        this.add([blocker, descPanel]);
-                        this.activeDescPanel = descPanel;
-                        this.activeBlocker = blocker;
-                    }
-                }).setDepth(4).setScrollFactor(0);
-                this.add(itemBtn);
-            }
+                    descPanel.setDepth(501).setScrollFactor(0).show();
+                    blocker.setDepth(500).setScrollFactor(0);
+
+                    this.add([blocker, descPanel]);
+                    this.activeDescPanel = descPanel;
+                    this.activeBlocker = blocker;
+                }
+            });
         });
 
         // 3. 關閉按鈕
@@ -403,7 +436,7 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
 
         const options = q.options || q.option; // Support both 'options' and 'option'
         options.forEach((optKey, index) => {
-            const y = + index * 130;
+            const y = -100 + index * 120;
             const btn = new CustomButton(this.scene, 0, y, optKey, `${optKey}_select`,
                 () => {
                     this.selectedAnswer(btn, index);
