@@ -213,20 +213,20 @@ export class GameScene_1 extends BaseGameScene {
 
         const currentFillPositions = this.targetContents.find(c => c.q === currentQuestionId).fillPositions;
 
-        // Debug graphics for fill positions
-        if (!this.fillDebugGraphics) {
-            this.fillDebugGraphics = this.add.graphics();
-        }
-        this.fillDebugGraphics.clear();
-        this.fillDebugGraphics.setDepth(250);
-        this.fillDebugGraphics.lineStyle(3, 0x00ff00, 1); // Green border
-        this.fillDebugGraphics.fillStyle(0x00ff00, 0.3); // Semi-transparent green fill
+        // // Debug graphics for fill positions
+        // if (!this.fillDebugGraphics) {
+        //     this.fillDebugGraphics = this.add.graphics();
+        // }
+        // this.fillDebugGraphics.clear();
+        // this.fillDebugGraphics.setDepth(250);
+        // this.fillDebugGraphics.lineStyle(3, 0x00ff00, 1); // Green border
+        // this.fillDebugGraphics.fillStyle(0x00ff00, 0.3); // Semi-transparent green fill
 
-        currentFillPositions.forEach((slot, index) => {
-            const radius = 30;
-            this.fillDebugGraphics.strokeCircle(slot.x, slot.y, radius);
-            this.fillDebugGraphics.fillCircle(slot.x, slot.y, radius);
-        });
+        // currentFillPositions.forEach((slot, index) => {
+        //     const radius = 30;
+        //     this.fillDebugGraphics.strokeCircle(slot.x, slot.y, radius);
+        //     this.fillDebugGraphics.fillCircle(slot.x, slot.y, radius);
+        // });
 
         // Build answerKey → fillAnswerKey lookup
         const choice = this.choices.find(c => c.q === currentQuestionId);
