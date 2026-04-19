@@ -1,307 +1,397 @@
+
 import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
-import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
+import { CustomPanel, CustomFailPanel, QuestionPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
 
 export class GameScene_1 extends BaseGameScene {
     constructor() {
         super('GameScene_1');
     }
+
     preload() {
+
         const path = 'assets/images/Game_1/';
 
         this.width = this.cameras.main.width;
         this.height = this.cameras.main.height;
         this.centerX = this.width / 2;
+        this.centerY = this.height / 2
+
+        this.load.image('game1_confirm_button', `${path}game1_confirm_button.png`);
+        this.load.image('game1_confirm_button_select', `${path}game1_confirm_button_select.png`);
+
+        this.load.image('game1_npc_box_mainstreet_01', `${path}game1_npc_box1.png`);
+        this.load.image('game1_npc_box_mainstreet_boy', `${path}game1_npc_box2_boy.png`);
+        this.load.image('game1_npc_box_mainstreet_girl', `${path}game1_npc_box2_girl.png`);
+
+        for (let i = 3; i <= 7; i++) {
+            this.load.image(`game1_npc_box${i}_game`, `${path}game1_npc_box${i}.png`);
+        }
+
+        this.load.image('game1_npc_box_win', `${path}game1_npc_box8.png`);
+        this.load.image('game1_npc_box_tryagain', `${path}game1_npc_box9.png`);
+
+        this.load.image(`game1_select_area`, `${path}game1_select_area.png`);
+        this.load.image('game1_object_description', `${path}game1_object_description.png`);
+
+        for (let i = 1; i <= 5; i++) {
+            this.load.image(`game1_q${i}`, `${path}game1_q${i}.png`);
+            this.load.image(`game1_q${i}_correct_answer1`, `${path}game1_q${i}_correct_answer1.png`);
+            this.load.image(`game1_q${i}_fail_answer2`, `${path}game1_q${i}_fail_answer2.png`);
+            this.load.image(`game1_q${i}_fail_answer3`, `${path}game1_q${i}_fail_answer3.png`);
+            this.load.image(`game1_q${i}_fail_answer4`, `${path}game1_q${i}_fail_answer4.png`);
+            this.load.image(`game1_q${i}_fill_answer1`, `${path}game1_q${i}_fill_answer1.png`);
+            this.load.image(`game1_q${i}_fill_answer2`, `${path}game1_q${i}_fill_answer2.png`);
+            this.load.image(`game1_q${i}_fill_answer3`, `${path}game1_q${i}_fill_answer3.png`);
+            this.load.image(`game1_q${i}_fill_answer4`, `${path}game1_q${i}_fill_answer4.png`);
+
+        }
+    }
+    create() {
+        this.width = this.cameras.main.width;
+        this.height = this.cameras.main.height;
+        this.centerX = this.width / 2;
         this.centerY = this.height / 2;
 
-        this.load.image('game1_npc_box_intro', `${path}game1_npc_box3.png`);
 
-        this.load.image('game1_npc_box_boy_win', `${path}game1_npc_box4.png`);
-        this.load.image('game1_npc_box_girl_win', `${path}game1_npc_girl_box4.png`);
-        this.load.image('game1_npc_box_win', `${path}game1_npc_box5.png`);
-        this.load.image('game1_npc_box_boy_win3', `${path}game1_npc_box6.png`);
-        this.load.image('game1_npc_box_girl_win3', `${path}game1_npc_girl_box6.png`);
+        this.spawnPositions = [
+            { x: this.centerX - 800, y: this.centerY - 100 },
+            { x: this.centerX + 800, y: this.centerY - 100 },
+            { x: this.centerX - 800, y: this.centerY + 100 },
+            { x: this.centerX + 800, y: this.centerY + 100 },
+        ];
 
-        this.load.image('game1_npc_box_tryagain', `${path}game1_npc_box7.png`);
+        this.currentIndex = 5;
 
-        this.gender = 'M';
-        if (localStorage.getItem('player')) {
-            this.gender = JSON.parse(localStorage.getItem('player')).gender;
-        }
 
-        if (this.gender === 'M') {
-            this.load.spritesheet('boy_fail', path +
-                'game1_boy_fail.png', { frameWidth: 340, frameHeight: 500 });
-
-            this.load.spritesheet('boy_left', path +
-                'game1_boy_left.png', { frameWidth: 340, frameHeight: 500 });
-
-            this.load.spritesheet('boy_middle', path +
-                'game1_boy_middle.png', { frameWidth: 340, frameHeight: 500 });
-
-            this.load.spritesheet('boy_right', path +
-                'game1_boy_right.png', { frameWidth: 340, frameHeight: 500 });
-
-            this.load.spritesheet('boy_success', path +
-                'game1_boy_success.png', { frameWidth: 340, frameHeight: 500 });
-        } else {
-            this.load.spritesheet('girl_fail', path +
-                'game1_girl_fail.png', { frameWidth: 623, frameHeight: 272 });
-
-            this.load.spritesheet('girl_left', path +
-                'game1_girl_left.png', { frameWidth: 623, frameHeight: 272 });
-
-            this.load.spritesheet('girl_middle', path +
-                'game1_girl_middle.png', { frameWidth: 623, frameHeight: 272 });
-
-            this.load.spritesheet('girl_right', path +
-                'game1_girl_right.png', { frameWidth: 623, frameHeight: 272 });
-
-            this.load.spritesheet('girl_success', path +
-                'game1_girl_success.png', { frameWidth: 623, frameHeight: 272 });
-        }
-
-    }
-
-    create() {
-        this.createAnimations();
-
-        this.initGame('game1_bg', 'game1_description', false, false, {
-            targetRounds: 1,
-            roundPerSeconds: 6000,
+        // Now call initGame which will call setupGameObjects
+        this.initGame('game1_bg', 'game1_description', true, false, {
+            targetRounds: 5,
+            roundPerSeconds: 120,
             isAllowRoundFail: false,
             isContinuousTimer: true,
             sceneIndex: 1
         });
 
-        this.leftBtn = new CustomButton(this, 1550, 900, 'left_btn', 'left_btn_click', () => {
-            this.moveDirection('left');
-            this.resetPlayerState();
-        }, () => {
-        }).setDepth(2);
+        this.gameUI.descriptionPanel.setVisible(false);
 
-        this.rightBtn = new CustomButton(this, 1750, 900, 'right_btn', 'right_btn_click',
-            () => {
-                this.moveDirection('right');
-                this.resetPlayerState();
-            }, () => {
+    }
 
-            }).setDepth(2);
+    setupGameObjects() {
+        this.input.removeAllListeners('drag');
+        this.input.removeAllListeners('dragend');
 
-        // Initially disable buttons until game starts
-        this.leftBtn.setVisible(false);
-        this.rightBtn.setVisible(false);
-        this.leftBtn.disableInteractive();
-        this.rightBtn.disableInteractive();
+        this.questionImage = this.add.image(this.centerX,
+            this.centerY + 50, `game1_q${this.currentIndex}`).setDepth(200);
 
-        this.genderKey = this.gender === 'M' ? 'boy' : 'girl';
-        console.log('genderKey:', this.genderKey);
+        this.confirmBtn = new CustomButton(this, this.centerX, this.centerY + 450,
+            'game1_confirm_button', 'game1_confirm_button_select', () => {
+                this.checkAnswer();
+            });
+        this.confirmBtn.setDepth(200).setVisible(true);
 
-        this.player = this.add.sprite(this.centerX, 1000, `${this.genderKey}_middle`)
-            .setOrigin(0.5, 1).setDepth(2);
-        this.player.anims.play(`${this.genderKey}_middle_anim`, true);
-
-        this.playerBasket = this.add.zone(this.player.x, this.player.y - 150, 180, 80);
-
-        this.physics.add.existing(this.playerBasket);
-        this.playerBasket.body.setAllowGravity(false);
-        this.playerBasket.body.setImmovable(true);
-
-        this.basketGfx = this.add.graphics();
-        this.basketGfx.setDepth(3);
-
-
-        // spawn settings
-        this.canSpawn = false;
-        this.minX = 200;
-        this.maxX = 1600;
-        this.minY = 0;
-        this.maxY = 700;
-        this.failSpeed = 4;
-        this.isSlowDown = false;
-        this.slowDownSpeed = this.failSpeed / 2;
-
-        this.successCount = 0;
-
-        this.itemKeys = [
-            'game1_failobject1',
-            'game1_failobject2',
-            'game1_failobject3',
-            'game1_failobject4',
-            'game1_successobject'
+        this.choices = [
+            {
+                q: 1,
+                answers: [
+                    'game1_q1_correct_answer1',
+                    'game1_q1_fail_answer2', 'game1_q1_fail_answer3',
+                    'game1_q1_fail_answer4'
+                ],
+                fillAnswers: [
+                    'game1_q1_fill_answer1',
+                    'game1_q1_fill_answer2', 'game1_q1_fill_answer3',
+                    'game1_q1_fill_answer4'
+                ]
+            },
+            {
+                q: 2,
+                answers: [
+                    'game1_q2_correct_answer1',
+                    'game1_q2_fail_answer2', 'game1_q2_fail_answer3',
+                    'game1_q2_fail_answer4'
+                ],
+                fillAnswers: [
+                    'game1_q2_fill_answer1',
+                    'game1_q2_fill_answer2', 'game1_q2_fill_answer3',
+                    'game1_q2_fill_answer4'
+                ]
+            },
+            {
+                q: 3,
+                answers: [
+                    'game1_q3_correct_answer1',
+                    'game1_q3_fail_answer2', 'game1_q3_fail_answer3',
+                    'game1_q3_fail_answer4'
+                ],
+                fillAnswers: [
+                    'game1_q3_fill_answer1',
+                    'game1_q3_fill_answer2', 'game1_q3_fill_answer3',
+                    'game1_q3_fill_answer4'
+                ]
+            },
+            {
+                q: 4,
+                answers: [
+                    'game1_q4_correct_answer1',
+                    'game1_q4_fail_answer2', 'game1_q4_fail_answer3',
+                    'game1_q4_fail_answer4'
+                ],
+                fillAnswers: [
+                    'game1_q4_fill_answer1',
+                    'game1_q4_fill_answer2', 'game1_q4_fill_answer3',
+                    'game1_q4_fill_answer4'
+                ]
+            },
+            {
+                q: 5,
+                answers: [
+                    'game1_q5_correct_answer1',
+                    'game1_q5_fail_answer2', 'game1_q5_fail_answer3',
+                    'game1_q5_fail_answer4'
+                ],
+                fillAnswers: [
+                    'game1_q5_fill_answer1',
+                    'game1_q5_fill_answer2', 'game1_q5_fill_answer3',
+                    'game1_q5_fill_answer4'
+                ]
+            }
         ];
-        Phaser.Utils.Array.Shuffle(this.itemKeys);
 
-        this.fallingItemsGroup = this.physics.add.group();
-        this.fallingItems = [];
-        this.spawnTimer = 0;
+        this.targetContents = [
+            {
+                q: 1,
+                fillPositions: [
+                    { x: 1110, y: 575, targetKey: 'game1_q1_correct_answer1' }
+                ]
+            },
+            {
+                q: 2,
+                fillPositions: [
+                    { x: 740, y: 565, targetKey: 'game1_q2_correct_answer1' },
+                    { x: 1335, y: 565, targetKey: 'game1_q2_correct_answer1' }
+                ]
+            },
+            {
+                q: 3,
+                fillPositions: [
+                    { x: 1055, y: 575, targetKey: 'game1_q3_correct_answer1' }
+                ]
+            },
+            {
+                q: 4,
+                fillPositions: [
+                    { x: 670, y: 575, targetKey: 'game1_q4_correct_answer1' },
+                ]
+            },
+            {
+                q: 5,
+                fillPositions: [
+                    { x: 1335, y: 575, targetKey: 'game1_q5b_correct_answer1' }
+                ]
+            }
+        ];
 
-        // Setup overlap between basket and falling items group
-        this.physics.add.overlap(this.playerBasket, this.fallingItemsGroup, (basket, item) => {
-            this.handleItemCollection(item);
-        }, null, this);
-    }
+        const currentFillPositions = this.targetContents[this.currentIndex - 1].fillPositions;
 
-    moveDirection(direction) {
-        const speed = 100;
-        this.player.anims.play(`${this.genderKey}_${direction}_anim`, true);
-        this.player.x += direction === 'left' ? -speed : speed;
-    }
+        // Debug graphics for fill positions
+        if (!this.fillDebugGraphics) {
+            this.fillDebugGraphics = this.add.graphics();
+        }
+        this.fillDebugGraphics.clear();
+        this.fillDebugGraphics.setDepth(250);
+        this.fillDebugGraphics.lineStyle(3, 0x00ff00, 1); // Green border
+        this.fillDebugGraphics.fillStyle(0x00ff00, 0.3); // Semi-transparent green fill
 
-    resetPlayerState() {
-        this.time.delayedCall(300, () => {
-            this.player.anims.play(`${this.genderKey}_middle_anim`, true);
+        currentFillPositions.forEach((slot, index) => {
+            const radius = 30;
+            this.fillDebugGraphics.strokeCircle(slot.x, slot.y, radius);
+            this.fillDebugGraphics.fillCircle(slot.x, slot.y, radius);
+        });
+
+        // Build answerKey → fillAnswerKey lookup
+        const choice = this.choices[this.currentIndex - 1];
+        const answerToFillMap = {};
+        choice.answers.forEach((key, i) => { answerToFillMap[key] = choice.fillAnswers[i]; });
+
+        // Build fill slots with invisible hint images
+        const snapTolerance = 100;
+        this.fillSlots = currentFillPositions.map(slot => ({
+            x: slot.x,
+            y: slot.y,
+            targetKey: slot.targetKey,
+            occupiedBy: null,
+            hintImage: this.add.image(slot.x, slot.y, 'game1_select_area')
+                .setDepth(199).setAlpha(0),
+            snapImage: null
+        }));
+
+        // Spawn answers at shuffled positions
+        const shuffledPositions = Phaser.Utils.Array.Shuffle([...this.spawnPositions]);
+        this.answerImages = [];
+        choice.answers.forEach((answerKey, index) => {
+            const pos = shuffledPositions[index];
+            const fillKey = answerToFillMap[answerKey];
+            const img = this.add.image(pos.x, pos.y, answerKey)
+                .setDepth(200)
+                .setInteractive({ draggable: true, useHandCursor: true });
+            img.setData({ answerKey, fillKey, originX: pos.x, originY: pos.y });
+            this.answerImages.push(img);
+        });
+
+        // Drag: move image and show hint on nearby empty slots
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.setPosition(dragX, dragY).setDepth(300);
+            const fillKey = gameObject.getData('fillKey');
+            this.fillSlots.forEach(slot => {
+                if (slot.occupiedBy) return;
+                const dist = Phaser.Math.Distance.Between(dragX, dragY, slot.x, slot.y);
+                if (dist < snapTolerance) {
+                    slot.hintImage.setTexture(fillKey).setAlpha(0.6);
+                } else {
+                    slot.hintImage.setAlpha(0);
+                }
+            });
+        });
+
+        // Drag end: snap to nearest slot or return to origin
+        this.input.on('dragend', (pointer, gameObject) => {
+            this.fillSlots.forEach(slot => slot.hintImage.setAlpha(0));
+
+            const answerKey = gameObject.getData('answerKey');
+            const fillKey = gameObject.getData('fillKey');
+
+            let nearest = null;
+            let nearestDist = snapTolerance;
+            this.fillSlots.forEach(slot => {
+                if (slot.occupiedBy) return;
+                const dist = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, slot.x, slot.y);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = slot;
+                }
+            });
+
+            if (nearest) {
+                nearest.occupiedBy = answerKey;
+                nearest.snapImage = this.add.image(nearest.x, nearest.y, fillKey)
+                    .setDepth(200)
+                    .setInteractive({ useHandCursor: true });
+
+                // Store reference to original image for later restoration
+                nearest.originalImage = gameObject;
+                gameObject.setVisible(false).disableInteractive();
+
+                // Click on placed answer to remove it and restore original
+                nearest.snapImage.once('pointerdown', () => {
+                    // Restore original image to spawn position
+                    gameObject.setVisible(true);
+                    gameObject.setInteractive({ draggable: true, useHandCursor: true });
+                    gameObject.setPosition(
+                        gameObject.getData('originX'),
+                        gameObject.getData('originY')
+                    ).setDepth(200);
+
+                    // Clear slot
+                    nearest.snapImage.destroy();
+                    nearest.snapImage = null;
+                    nearest.occupiedBy = null;
+                    nearest.originalImage = null;
+                });
+            } else {
+                gameObject.setPosition(
+                    gameObject.getData('originX'),
+                    gameObject.getData('originY')
+                ).setDepth(200);
+            }
         });
     }
 
-    enableGameInteraction(enabled) {
-        this.canSpawn = enabled;
-        this.leftBtn.setVisible(enabled);
-        this.rightBtn.setVisible(enabled);
 
-        if (enabled) {
-            this.leftBtn.setInteractive();
-            this.rightBtn.setInteractive();
+    checkAnswer() {
+        const allCorrect = this.fillSlots.every(slot => slot.occupiedBy === slot.targetKey);
+        if (allCorrect) {
+            this.onRoundWin();
         } else {
-            this.leftBtn.disableInteractive();
-            this.rightBtn.disableInteractive();
+            this.handleLose();
         }
+    }
+
+    onRoundWin() {
+        if (!this.isGameActive || this.gameState === 'gameWin') return;
+
+        let isFinalWin = (this.currentIndex == this.targetRounds);
+        this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
+
+        // Sync roundIndex with currentIndex for UI updates
+        this.roundIndex = this.currentIndex - 1;
+
+        if (isFinalWin) {
+            this.gameTimer.stop();
+            this._calculateTiming(isFinalWin);
+            this.enableGameInteraction(false);
+            this.showFeedbackLabel(true);
+            this.showBubble('win');
+        } else {
+            this.currentIndex++;
+            this.resetForNewRound();
+        }
+        this.updateRoundUI(true);
+    }
+
+    enableGameInteraction(enabled) {
+        if (!this.answerImages) return;
+        this.answerImages.forEach(img => {
+            if (!img.active) return;
+            if (enabled) {
+                img.setInteractive({ draggable: true, useHandCursor: true });
+            } else {
+                img.disableInteractive();
+            }
+        });
+
+        this.confirmBtn.setVisible(enabled);
     }
 
     resetForNewRound() {
-        // Clear all falling items from both group and array
-        if (this.fallingItemsGroup) {
-            this.fallingItemsGroup.clear(true, true); // Remove and destroy all children
+        // Reset currentIndex to 1 on full game restart (restartGame sets gameState to 'init')
+        if (this.gameState === 'init') {
+            this.currentIndex = 1;
         }
 
-        for (let i = this.fallingItems.length - 1; i >= 0; i--) {
-            const item = this.fallingItems[i];
-            if (item) {
-                item.destroy();
-            }
-        }
-        this.fallingItems = [];
+        // Destroy question image
+        if (this.questionImage) { this.questionImage.destroy(); this.questionImage = null; }
 
-        // Reset spawn timer
-        this.lastSpawnTime = null;
-        this.canSpawn = false;
+        // Destroy confirm button
+        if (this.confirmBtn) { this.confirmBtn.destroy(); this.confirmBtn = null; }
 
-        // Reset player position to center
-        if (this.player) {
-            this.player.x = this.centerX;
-            this.player.y = 1000;
-            this.player.anims.play(`${this.genderKey}_middle_anim`, true);
+        // Destroy answer images
+        if (this.answerImages) {
+            this.answerImages.forEach(img => img.destroy());
+            this.answerImages = [];
         }
 
-        // Reset player basket to match player position and update physics body
-        if (this.playerBasket && this.playerBasket.body) {
-            const newX = this.centerX;
-            const newY = 1000 - 450; // Same calculation as in update
-
-            this.playerBasket.x = newX;
-            this.playerBasket.y = newY;
-
-            // Important: Update the physics body position explicitly
-            this.playerBasket.body.reset(newX, newY);
-        }
-
-        // Reset fail speed
-        this.failSpeed = 4;
-        this.isSlowDown = false;
-
-        // Reset success counter
-        this.successCount = 0;
-
-        console.log('[GameScene_1] Reset for new round');
-    }
-
-
-    update() {
-
-        if (!this.canSpawn) return;
-
-        if (this.player && this.playerBasket) {
-            // Sync the invisible physics body - update both position and physics body
-            this.playerBasket.x = this.player.x;
-            this.playerBasket.y = this.player.y - 450;
-
-            // Update the physics body position to match
-            if (this.playerBasket.body) {
-                this.playerBasket.body.x = this.playerBasket.x - this.playerBasket.width / 2;
-                this.playerBasket.body.y = this.playerBasket.y - this.playerBasket.height / 2;
-            }
-
-            // Redraw the visual box
-            this.basketGfx.clear();
-            this.basketGfx.lineStyle(2, 0x00ff00, 1); // Green border
-            this.basketGfx.strokeRect(
-                this.playerBasket.x - 75, // Center it (150 width / 2)
-                this.playerBasket.y - 25, // Center it (50 height / 2)
-                this.playerBasket.width,
-                this.playerBasket.height
-            );
-            // Spawn new item every 800ms (or adjust as needed)
-            if (!this.lastSpawnTime) this.lastSpawnTime = this.time.now;
-            if (this.time.now - this.lastSpawnTime > 800) {
-                this.spawnRandomItem();
-                this.lastSpawnTime = this.time.now;
-            }
-
-            // Make all falling items fall
-            for (let i = this.fallingItems.length - 1; i >= 0; i--) {
-                const item = this.fallingItems[i];
-                if (item.active) {
-                    item.y += this.failSpeed; // fall speed
-                    if (item.y > this.maxY) {
-                        item.setActive(false).setVisible(false);
-                        this.fallingItems.splice(i, 1);
-                    }
-                }
-            }
-        }
-    }
-
-
-
-    handleLose() {
-        if (this.gameState === 'gameLose' || this.gameState === 'gameWin') return;
-
-        if (!this.isSlowDown) {
-            this.failSpeed = this.slowDownSpeed;
-            this.isSlowDown = true;
-            console.log("Fail speed reduced for next rounds.");
-        } else {
-            this.currentFailCount = (this.currentFailCount || 0) + 1;
-            this.isGameActive = false;
-            this.gameState = 'gameLose';
-            this.fallingItems.forEach(item => item.destroy());
-            this.label = this.add.image(1650, 350, 'game_fail_label').setDepth(555);
-            if (this.gameTimer) this.gameTimer.stop();
-            this.enableGameInteraction(false);
-            this.updateRoundUI(false);
-
-            this.showBubble('tryagain');
-        }
-    }
-
-    showWin() {
-
-        // Second: Show generic win2 bubble
-        this.bubbleImage2 = this.add.image(this.centerX, this.cameras.main.height * 0.8, 'game1_npc_box_win')
-            .setDepth(555).setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                this.bubbleImage2.destroy();
-
-                // Third: Show gender-specific win3 bubble
-                this.bubbleImage3 = this.add.image(this.centerX, this.cameras.main.height * 0.8, `game1_npc_box_${this.genderKey}_win3`)
-                    .setDepth(555).setInteractive({ useHandCursor: true })
-                    .on('pointerdown', () => {
-                        this.bubbleImage3.destroy();
-                        this.showObjectPanel();
-                    });
+        // Destroy fill slot hint/snap images
+        if (this.fillSlots) {
+            this.fillSlots.forEach(slot => {
+                if (slot.hintImage) slot.hintImage.destroy();
+                if (slot.snapImage) slot.snapImage.destroy();
             });
+            this.fillSlots = [];
+        }
 
+        this.setupGameObjects();
+
+        // Reset game state for new round
+        this.gameState = 'playing';
+        this.isGameActive = true;
+        this.gameTimer.start();
+        this.enableGameInteraction(true);
+
+    }
+    showWin() {
+        this.showObjectPanel();
     }
 
     showObjectPanel() {
@@ -312,116 +402,17 @@ export class GameScene_1 extends BaseGameScene {
         }]);
         objectPanel.setDepth(1000);
         objectPanel.show();
-        objectPanel.setCloseCallBack(() => GameManager.backToMainStreet(this));
-    }
-
-    spawnRandomItem() {
-        // Pick a random item key from the shuffled array
-        const key = Phaser.Utils.Array.GetRandom(this.itemKeys);
-        // Spawn at random x, always y = minY
-        const x = Phaser.Math.Between(this.minX, this.maxX);
-
-
-        const y = this.minY;
-        // Create the sprite
-        const item = this.physics.add.sprite(x, y, key).setOrigin(0.5, 0.5).setDepth(2);
-        item.isSuccessObject = (key === 'game1_successobject');
-
-        item.setActive(true).setVisible(true);
-        this.fallingItemsGroup.add(item);
-        this.fallingItems.push(item);
+        //objectPanel.setCloseCallBack(() => GameManager.backToMainStreet(this));
     }
 
 
-    handleItemCollection(item) {
-        if (!this.isGameActive) return;
-
-        if (item.isSuccessObject) {
-            item.destroy();
-
-            // Increment success counter
-            this.successCount++;
-            console.log(`Success item collected! Count: ${this.successCount}/${this.targetRounds}`);
-
-            // Update round UI to show progress (uses current roundIndex)
-            this.updateRoundUI(true);
-
-            // Only trigger win when all required successes are collected
-            if (this.successCount >= this.targetRounds) {
-                this.onRoundWin();
-            } else {
-                // Increment roundIndex for next collection's UI update
-                this.roundIndex++;
-            }
-        } else {
-            item.destroy();
-            this.fallingItemsGroup.remove(item);
-            this.handleLose();
-        }
-    }
-    createAnimations() {
-        // Boy animations
-        this.anims.create({
-            key: 'boy_fail_anim',
-            frames: this.anims.generateFrameNumbers('boy_fail', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
+    showFailPanel() {
+        const popupPanel = new CustomFailPanel(this, 960, 540, () => {
+            popupPanel.destroy();
+            this.restartGame(); // 重新開始整個遊戲
+        }, () => {
+            //GameManager.backToMainStreet(this);
         });
-        this.anims.create({
-            key: 'boy_left_anim',
-            frames: this.anims.generateFrameNumbers('boy_left', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'boy_middle_anim',
-            frames: this.anims.generateFrameNumbers('boy_middle', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'boy_right_anim',
-            frames: this.anims.generateFrameNumbers('boy_right', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'boy_success_anim',
-            frames: this.anims.generateFrameNumbers('boy_success', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-
-        // Girl animations
-        this.anims.create({
-            key: 'girl_fail_anim',
-            frames: this.anims.generateFrameNumbers('girl_fail', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'girl_left_anim',
-            frames: this.anims.generateFrameNumbers('girl_left', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'girl_middle_anim',
-            frames: this.anims.generateFrameNumbers('girl_middle', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'girl_right_anim',
-            frames: this.anims.generateFrameNumbers('girl_right', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'girl_success_anim',
-            frames: this.anims.generateFrameNumbers('girl_success', { start: 0, end: 66 }),
-            frameRate: 30,
-            repeat: -1
-        });
+        popupPanel.setDepth(1000);
     }
 }

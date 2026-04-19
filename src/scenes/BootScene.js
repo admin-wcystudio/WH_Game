@@ -109,17 +109,6 @@ export class BootScene extends Phaser.Scene {
         this.load.image('game_timer_bg', asset_path + 'game1_timer.png');
         this.load.image('popup_bg', asset_path + 'popup_bg.png');
 
-        //game 1 asset
-        for (let i = 1; i <= 4; i++) {
-            this.load.image(`game1_failobject${i}`, `assets/images/Game_1/game1_failobject${i}.png`);
-        }
-        this.load.image('game1_successobject', 'assets/images/Game_1/game1_successobject.png');
-        this.load.image('left_btn', asset_path + 'game1_left_button.png');
-        this.load.image('left_btn_click', asset_path + 'game1_left_button_click.png');
-        this.load.image('right_btn', asset_path + 'game1_right_button.png');
-        this.load.image('right_btn_click', asset_path + 'game1_right_button_click.png');
-        this.load.image('game1_object_description', asset_path + 'game1_object_description.png');
-
         // load game bg
         for (let i = 1; i <= 7; i++) {
             this.load.image(`game${i}_description`, `assets/images/Game_${i}/game${i}_description.png`);
@@ -142,7 +131,7 @@ export class BootScene extends Phaser.Scene {
 
             this.registry.set('globalSettings', settings);
         }
-        this.scene.start('GameStartScene');
+        this.scene.start('GameScene_1');
     }
 }
 
