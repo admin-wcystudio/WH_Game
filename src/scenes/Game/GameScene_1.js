@@ -26,7 +26,7 @@ export class GameScene_1 extends BaseGameScene {
         this.load.image('game1_npc_box_mainstreet_girl', `${path}game1_npc_box2_girl.png`);
 
         for (let i = 3; i <= 7; i++) {
-            this.load.image(`game1_npc_box${i}_game`, `${path}game1_npc_box${i}.png`);
+            this.load.image(`game1_npc_box${i}`, `${path}game1_npc_box${i}.png`);
         }
 
         this.load.image('game1_npc_box_win', `${path}game1_npc_box8.png`);
@@ -177,32 +177,37 @@ export class GameScene_1 extends BaseGameScene {
                 q: 1,
                 fillPositions: [
                     { x: 1110, y: 575, targetKey: 'game1_q1_correct_answer1' }
-                ]
+                ],
+                descriptionDialog: 'game1_npc_box3'
             },
             {
                 q: 2,
                 fillPositions: [
                     { x: 740, y: 565, targetKey: 'game1_q2_correct_answer1' },
                     { x: 1335, y: 565, targetKey: 'game1_q2_correct_answer1' }
-                ]
+                ],
+                descriptionDialog: 'game1_npc_box4'
             },
             {
                 q: 3,
                 fillPositions: [
                     { x: 1055, y: 575, targetKey: 'game1_q3_correct_answer1' }
-                ]
+                ],
+                descriptionDialog: 'game1_npc_box5'
             },
             {
                 q: 4,
                 fillPositions: [
                     { x: 670, y: 575, targetKey: 'game1_q4_correct_answer1' },
-                ]
+                ],
+                descriptionDialog: 'game1_npc_box6'
             },
             {
                 q: 5,
                 fillPositions: [
                     { x: 1335, y: 575, targetKey: 'game1_q5_correct_answer1' }
-                ]
+                ],
+                descriptionDialog: 'game1_npc_box7'
             }
         ];
 
@@ -338,6 +343,8 @@ export class GameScene_1 extends BaseGameScene {
         let isFinalWin = (this.currentIndex + 1 >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
 
+
+
         if (isFinalWin) {
             this.roundIndex = this.currentIndex;
             this.gameTimer.stop();
@@ -346,9 +353,12 @@ export class GameScene_1 extends BaseGameScene {
             this.showFeedbackLabel(true);
             this.showBubble('win');
         } else {
+            this.gameTimer.stop();
+            this.enableGameInteraction(false);
+            this.showDescriptionDialog();
             this.currentIndex++;
             this.roundIndex = this.currentIndex - 1;
-            this.resetForNewRound();
+
         }
         this.updateRoundUI(true);
     }
@@ -374,6 +384,9 @@ export class GameScene_1 extends BaseGameScene {
             this.questionOrder = Phaser.Utils.Array.Shuffle([1, 2, 3, 4, 5]).slice(0, 3);
             console.log('Shuffled question order:', this.questionOrder);
         }
+
+        // Keep roundIndex aligned with current active question
+        this.roundIndex = this.currentIndex;
 
         // Destroy question image
         if (this.questionImage) { this.questionImage.destroy(); this.questionImage = null; }
@@ -407,6 +420,24 @@ export class GameScene_1 extends BaseGameScene {
     }
     showWin() {
         this.showObjectPanel();
+    }
+
+    showDescriptionDialog() {
+        const currentQuestionId = this.questionOrder[this.currentIndex];
+        const targetContent = this.targetContents.find(c => c.q === currentQuestionId);
+
+        this.descriptionDialog = this.add.image(
+            this.centerX, this.cameras.main.height * 0.8,
+            targetContent?.descriptionDialog)
+            .setDepth(300)
+            .setInteractive({ useHandCursor: true });
+
+        this.descriptionDialog.once('pointerdown', () => {
+            this.descriptionDialog.destroy();
+
+            this.resetForNewRound();
+        });
+
     }
 
     showObjectPanel() {
