@@ -197,14 +197,10 @@ export default class BaseGameScene extends Phaser.Scene {
                     if (this.roundIndex + 1 < this.targetRounds) {
                         this.nextRound();
                     } else {
-                        this.showLose(() => {
-                            this.showFailPanel();
-                        });
+                        this.showLose();
                     }
                 } else {
-                    this.showLose(() => {
-                        this.showFailPanel();
-                    });
+                    this.showLose();
                 }
             });
 
@@ -506,8 +502,8 @@ export default class BaseGameScene extends Phaser.Scene {
 
     showWin() { }
 
-    showLose(onComplete) {
-        if (onComplete) onComplete();
+    showLose() {
+        this.showFailPanel();
     }
     // --- Utilities ---
 

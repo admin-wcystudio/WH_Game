@@ -22,6 +22,11 @@ export class GameScene_2 extends BaseGameScene {
         this.load.image('game2_npc_box_tryagain', `${path}game2_npc_box5.png`);
         this.load.image('game2_npc_box_tryagain_02', `${path}game2_npc_box6.png`);
 
+        this.load.image('left_btn', `${path}game2_left_button.png`);
+        this.load.image('left_btn_click', `${path}game2_left_button_click.png`);
+        this.load.image('right_btn', `${path}game2_right_button.png`);
+        this.load.image('right_btn_click', `${path}game2_right_button_click.png`);
+
         for (let i = 1; i <= 4; i++) {
             this.load.image(`game2_failobject${i}`, `${path}game2_failobject${i}.png`);
         }
@@ -77,7 +82,7 @@ export class GameScene_2 extends BaseGameScene {
         this.playerStartX = this.centerX + 50;
         this.playerStartY = 800;
 
-        this.initGame('game2_bg', 'game2_description', false, true, {
+        this.initGame('game2_bg', 'game2_description', true, false, {
             targetRounds: 3,
             roundPerSeconds: 60,
             isAllowRoundFail: false,
@@ -302,6 +307,25 @@ export class GameScene_2 extends BaseGameScene {
 
             this.showBubble('tryagain');
         }
+    }
+
+    showLose() {
+        this.loseDialog = this.add.image(this.centerX, this.cameras.main.height * 0.8, 'game2_npc_box_tryagain_02')
+            .setDepth(1000).setInteractive({ useHandCursor: true });
+
+        this.loseDialog.on('pointerdown', () => {
+            this.loseDialog.destroy();
+            this.showFailPanel();
+        });
+    }
+
+    showWin() {
+        this.winDialog = this.add.image(this.centerX, this.cameras.main.height * 0.8, 'game2_npc_box_win_01')
+            .setDepth(1000).setInteractive({ useHandCursor: true });
+        this.winDialog.on('pointerdown', () => {
+            this.winDialog.destroy();
+            this.showObjectPanel();
+        });
     }
 
 
