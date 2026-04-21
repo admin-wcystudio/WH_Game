@@ -17,245 +17,258 @@ export class GameScene_3 extends BaseGameScene {
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
 
-        this.load.image('game3_npc_box_intro', `${path}game3_npc_box3.png`);
-        this.load.image('game3_card', `${path}game3_card.png`);
-        this.load.image('game3_card_select', `${path}game3_card_select.png`);
+        this.load.image('game3_npc_box_mainstreet', `${path}game3_npc_box1.png`);
 
-        this.load.image('game3_card1a', `${path}game3_card1a.png`);
-        this.load.image('game3_card1b', `${path}game3_card1b.png`);
-        this.load.image('game3_card2a', `${path}game3_card2a.png`);
-        this.load.image('game3_card2b', `${path}game3_card2b.png`);
-        this.load.image('game3_card3a', `${path}game3_card3a.png`);
-        this.load.image('game3_card3b', `${path}game3_card3b.png`);
-        this.load.image('game3_card4a', `${path}game3_card4a.png`);
-        this.load.image('game3_card4b', `${path}game3_card4b.png`);
-        this.load.image('game3_card5a', `${path}game3_card5a.png`);
-        this.load.image('game3_card5b', `${path}game3_card5b.png`);
+        this.load.image('game3_npc_box_win', `${path}game3_npc_box2.png`);
+        this.load.image('game3_npc_box_tryagain', `${path}game3_npc_box3.png`);
 
-        this.load.image('game3_npc_box_intro', `${path}game3_npc_box3.png`);
-        this.load.image('game3_npc_box_win', `${path}game3_npc_box4.png`);
-        this.load.image('game3_npc_box_tryagain', `${path}game3_npc_box5.png`);
-        this.load.image('game3_preview', `${path}game3_success_preview1.png`);
+        this.load.image('game3_hit_button', `${path}game3_click_button.png`);
+        this.load.image('game3_hit_button_select', `${path}game3_click_button_select.png`)
+
+        this.load.image('game3_object_description', path + 'game3_object_description.png');;
+        this.load.image('game3_target_arrow', `${path}game3_arrow.png`);
+
+        for (let i = 1; i <= 3; i++) {
+            this.load.image(`game3_bar${i}`, `${path}game3_bar${i}.png`);
+        }
 
     }
 
     create() {
-        const centerX = this.cameras.main.width / 2;
-        const centerY = this.cameras.main.height / 2 + 50;
+        this.arrow = this.add.image(this.centerX, this.centerY - 100, 'game3_target_arrow')
+            .setDepth(501).setVisible(true);
 
-        // Initialize game data before initGame (which calls setupGameObjects)
-        this.isChecked = false;
+        this.bar = this.add.image(this.centerX, this.centerY + 100, 'game3_bar1')
+            .setDepth(500).setVisible(true);
 
-        // Set 10 fixed card spawn positions (2 rows of 5)
-        this.spawnCardPositions = [
-            { x: centerX - 500, y: centerY - 150 },
-            { x: centerX - 250, y: centerY - 150 },
-            { x: centerX, y: centerY - 150 },
-            { x: centerX + 250, y: centerY - 150 },
-            { x: centerX + 500, y: centerY - 150 },
-            { x: centerX - 500, y: centerY + 150 },
-            { x: centerX - 250, y: centerY + 150 },
-            { x: centerX, y: centerY + 150 },
-            { x: centerX + 250, y: centerY + 150 },
-            { x: centerX + 500, y: centerY + 150 }
-        ];
-
-        // Card pairs data (5 pairs = 10 cards)
-        this.cardTypes = [
-            'game3_card1a', 'game3_card1b',
-            'game3_card2a', 'game3_card2b',
-            'game3_card3a', 'game3_card3b',
-            'game3_card4a', 'game3_card4b',
-            'game3_card5a', 'game3_card5b'
-        ];
-
-        this.cards = [];
-        this.flippedCards = [];
-        this.matchedPairs = 0;
-
-        // Now call initGame which will call setupGameObjects
-        this.initGame('game3_bg', 'game3_description', false, false, {
-            targetRounds: 1,
-            roundPerSeconds: 60,
+        this.initGame('game3_bg', 'game3_description', true, false, {
+            targetRounds: 3,
+            roundPerSeconds: 30,
             isAllowRoundFail: false,
             isContinuousTimer: true,
             sceneIndex: 3
         });
+
+    }
+
+    update() {
+        if (!this.arrow || this.isHit) return;
+
+        // Bouncing logic
+        this.arrow.x += this.arrowSpeed;
+
+        if (this.arrow.x >= 1580) {
+            this.arrow.x = 1580;
+            this.arrowSpeed = -Math.abs(this.arrowSpeed); // Turn left
+        } else if (this.arrow.x <= 350) {
+            this.arrow.x = 350;
+            this.arrowSpeed = Math.abs(this.arrowSpeed); // Turn right
+        }
     }
 
     setupGameObjects() {
-        // Shuffle card types
-        const shuffledTypes = Phaser.Utils.Array.Shuffle([...this.cardTypes]);
+        this.arrowSpeed = 10; // Initial speed of the arrow
+        this.isHit = false;
+        this.successfulHits = 0; // Track number of successful hits
 
-        // Shuffle positions
-        const shuffledPositions = Phaser.Utils.Array.Shuffle([...this.spawnCardPositions]);
+        // Define success ranges for each bar (min and max x positions)
+        this.hitRanges = [
+            { min: 410, max: 620 },  // Bar 1 success range
+            { min: 1220, max: 1420 },  // Bar 2 success range
+            { min: 990, max: 1250 }   // Bar 3 success range
+        ];
 
-        console.log('Creating cards at positions:', shuffledPositions);
+        this.hitButton = new CustomButton(this, 1720, 880,
+            'game3_hit_button', 'game3_hit_button_select',
+            () => this.handleHitButtonClick()
+        )
+            .setDepth(502);
 
-        // Create cards at random positions
-        shuffledTypes.forEach((cardType, index) => {
-            const pos = shuffledPositions[index];
-
-            // Create card container
-            const card = this.add.container(pos.x, pos.y).setDepth(500);
-
-            // Card back (initially visible)
-            const cardBack = this.add.image(0, 0, 'game3_card')
-                .setInteractive({ useHandCursor: true })
-                .setVisible(true)
-                .setScale(1);
-
-            // Card front (hidden initially) - scale to match card back size
-            const cardFront = this.add.image(0, 0, cardType)
-                .setVisible(false)
-                .setScale(0.55);
-
-            card.add([cardBack, cardFront]);
-
-            // Store card data
-            card.cardType = cardType;
-            card.cardBack = cardBack;
-            card.cardFront = cardFront;
-            card.isFlipped = false;
-            card.isMatched = false;
-
-            cardBack.on('pointerover', () => {
-                cardBack.setTexture('game3_card_select');
-            });
-
-            cardBack.on('pointerout', () => {
-                cardBack.setTexture('game3_card');
-            });
-
-            // Add click handler
-            cardBack.on('pointerdown', () => this.onCardClick(card));
-
-            this.cards.push(card);
+        // Add hover effect to hit button
+        this.hitButton.on('pointerover', () => {
+            this.hitButton.setTexture('game3_hit_button_select');
         });
 
-        console.log(`Created ${this.cards.length} cards`);
-    }
-
-    onCardClick(card) {
-        if (!this.isGameActive || this.isChecking || card.isFlipped || card.isMatched) {
-            return;
-        }
-
-        // Flip the card
-        this.flipCard(card, true);
-        this.flippedCards.push(card);
-
-        // Check if two cards are flipped
-        if (this.flippedCards.length === 2) {
-            this.isChecking = true;
-            this.checkMatch();
-        }
-    }
-
-    flipCard(card, faceUp) {
-        card.isFlipped = faceUp;
-        card.cardBack.setVisible(!faceUp);
-        card.cardFront.setVisible(faceUp);
-
-        // Optional: Add flip animation
-        this.tweens.add({
-            targets: card,
-            scaleX: faceUp ? 1 : 1,
-            duration: 150,
-            ease: 'Linear'
+        this.hitButton.on('pointerout', () => {
+            this.hitButton.setTexture('game3_hit_button');
         });
+
+        //     this.drawDebugRanges();
     }
 
-    checkMatch() {
-        const [card1, card2] = this.flippedCards;
+    // drawDebugRanges() {
+    //     const colors = [0x00ff00, 0x0088ff, 0xff8800];
+    //     const labels = ['Bar 1', 'Bar 2', 'Bar 3'];
+    //     const gfx = this.add.graphics().setDepth(600);
 
-        // Extract pair number (e.g., "card1a" and "card1b" are a match)
-        const type1 = card1.cardType.replace(/[ab]$/, '');
-        const type2 = card2.cardType.replace(/[ab]$/, '');
+    //     this.hitRanges.forEach((range, i) => {
+    //         gfx.fillStyle(colors[i], 0.25);
+    //         gfx.fillRect(range.min, 0, range.max - range.min, this.height);
+    //         gfx.lineStyle(2, colors[i], 0.8);
+    //         gfx.strokeRect(range.min, 0, range.max - range.min, this.height);
 
-        if (type1 === type2) {
-            // Match found!
-            this.time.delayedCall(500, () => {
-                card1.isMatched = true;
-                card2.isMatched = true;
+    //         this.add.text(range.min + 4, 10 + i * 24, `${labels[i]}: ${range.min}–${range.max}`, {
+    //             fontSize: '18px', color: '#ffffff', stroke: '#000000', strokeThickness: 3
+    //         }).setDepth(601);
+    //     });
+    // }
 
-                // Make cards disappear with animation
-                this.tweens.add({
-                    targets: [card1, card2],
-                    alpha: 0,
-                    scale: 0.5,
-                    duration: 300,
-                    ease: 'Back.easeIn',
-                    onComplete: () => {
-                        card1.destroy();
-                        card2.destroy();
-                    }
-                });
+    handleHitButtonClick() {
+        if (this.isHit || !this.isGameActive) return; // Prevent multiple clicks
 
-                // Increment matched pairs count
-                this.matchedPairs++;
-                console.log(`Matched pairs: ${this.matchedPairs}/5`);
+        this.isHit = true;
+        this.arrowSpeed = 0;
+        this.hitButton.setTexture('game3_hit_button'); // Reset button texture on click
+        this.checkHitSuccess();
+    }
 
-                // Check if all 5 pairs matched - WIN!
-                if (this.matchedPairs === 5) {
-                    console.log('All pairs matched! You win!');
-                    this.time.delayedCall(500, () => {
-                        this.onRoundWin();
-                    });
-                }
+    checkHitSuccess() {
+        const currentBarIndex = this.successfulHits; // 0, 1, or 2
+        const range = this.hitRanges[currentBarIndex];
+        const arrowX = this.arrow.x;
 
-                this.flippedCards = [];
-                this.isChecking = false;
-            });
+        console.log(`Arrow at x=${arrowX}, Range: ${range.min}-${range.max}`);
+
+        // Check if arrow is within the success range
+        if (arrowX >= range.min && arrowX <= range.max) {
+            this.onRoundWin();
         } else {
-            // No match, flip back
-            this.time.delayedCall(1000, () => {
-                this.flipCard(card1, false);
-                this.flipCard(card2, false);
-                this.flippedCards = [];
-                this.isChecking = false;
+            console.log('Hit failed - outside range');
+            // Update roundIndex to current attempt so correct UI element is marked as failed
+            this.roundIndex = this.successfulHits;
+            this.time.delayedCall(500, () => {
+                this.handleLose();
             });
         }
     }
 
+    /**
+     * Override: Called when a round/game is won
+     */
+    onRoundWin() {
+        if (!this.isGameActive || this.gameState === 'gameWin') return;
 
+        // Increment successful hits
+        this.successfulHits++;
+        console.log(`Hit ${this.successfulHits}/3 successful!`);
 
-    enableGameInteraction(enabled) {
-        this.cards.forEach(card => {
-            // Skip if card is destroyed or matched
-            if (!card || card.isMatched || !card.cardBack) return;
+        // Sync roundIndex with successfulHits for proper round UI update
+        this.roundIndex = this.successfulHits - 1;
 
-            if (enabled) {
-                card.cardBack.setInteractive();
+        // Determine if this is the last round (3rd successful hit)
+        let isGameWin = (this.successfulHits >= this.targetRounds);
+        console.log('遊戲狀態改為:', isGameWin ? 'gameWin' : 'roundWin');
+
+        this.gameState = isGameWin ? 'gameWin' : 'roundWin';
+
+        if (this.gameTimer) this.gameTimer.stop();
+
+        if (this.gameTimer && typeof this.gameTimer.getRemaining === 'function') {
+            if (this.isContinuousTimer) {
+                if (isGameWin) {
+                    this.totalUsedSeconds = Math.max(0, this.roundPerSeconds - this.gameTimer.getRemaining());
+                }
             } else {
-                card.cardBack.disableInteractive();
+                const used = Math.max(0, this.roundPerSeconds - this.gameTimer.getRemaining());
+                this.totalUsedSeconds += used;
             }
-        });
+        }
+
+        this.enableGameInteraction(false);
+        this.updateRoundUI(true);
+
+        // Show feedback and bubble
+        if (isGameWin) {
+
+            this.label = this.add.image(1650, 350, 'game_success_label').setDepth(555);
+            this.showBubble('win', this.playerGender);
+        } else {
+
+            this.showBubble('noBubble', this.playerGender);
+        }
+    }
+
+    /**
+     * Override: Called when win bubble is closed - moves to next bar or ends game
+     */
+    onWinBubbleClose() {
+        if (!this.isGameActive) return;
+
+        if (this.gameState === 'roundWin') {
+            // For round win, move to next bar instead of nextRound()
+            this.time.delayedCall(500, () => {
+                this.nextBar();
+            });
+
+        } else if (this.gameState === 'gameWin') {
+            // Save game result
+            if (this.sceneIndex > 0) {
+                GameManager.saveGameResult(this.sceneIndex, true, this.totalUsedSeconds);
+                console.log(`遊戲 ${this.sceneIndex} 結束，總用時: ${this.totalUsedSeconds} 秒`);
+            }
+            this.showWin();
+            this.isGameActive = false;
+            this.gameState = 'completed';
+        }
+    }
+
+    nextBar() {
+        // Reset for next round
+        this.isHit = false;
+        this.arrow.x = this.centerX;
+        this.arrowSpeed = 10;
+
+        // Update bar image for next question
+        const barKeys = ['game3_bar1', 'game3_bar2', 'game3_bar3'];
+        this.bar.setTexture(barKeys[this.successfulHits]);
+
+        console.log(`Moving to bar ${this.successfulHits + 1}`);
+
+        // Clear feedback label
+        if (this.feedbackLabel) {
+            this.feedbackLabel.destroy();
+            this.feedbackLabel = null;
+        }
+
+        // Re-enable interaction and continue playing
+        this.gameState = 'playing';
+        this.isGameActive = true;
+        this.enableGameInteraction(true);
+
+        // Resume timer if continuous
+        if (this.gameTimer && this.isContinuousTimer) {
+            this.gameTimer.start();
+        }
     }
 
     resetForNewRound() {
-        // Destroy existing cards
-        if (this.cards) {
-            this.cards.forEach(card => card.destroy());
+        // Reset game state
+        this.isHit = false;
+        this.successfulHits = 0;
+        this.arrowSpeed = 10;
+
+        if (this.arrow) {
+            this.arrow.x = this.centerX;
         }
 
-        this.cards = [];
-        this.flippedCards = [];
-        this.matchedPairs = 0;
-        this.isChecking = false;
+        if (this.bar) {
+            this.bar.setTexture('game3_bar1');
+        }
+    }
 
-        // Recreate cards
-        this.setupGameObjects();
+    enableGameInteraction(enabled) {
+        if (this.hitButton) {
+            if (enabled) {
+                this.hitButton.setInteractive();
+            } else {
+                this.hitButton.disableInteractive();
+            }
+        }
+        this.allowToStart = enabled;
     }
 
     showWin() {
-        this.winPreview = this.add.image(this.centerX, this.centerY + 100, 'game3_preview').setDepth(1000)
-            .setInteractive({ useHandCursor: true }).setScale(1.3)
-            .on('pointerdown', () => {
-                this.winPreview.destroy();
-                this.showObjectPanel();
-            });
-
+        this.showObjectPanel();
     }
 
     showObjectPanel() {
@@ -268,5 +281,6 @@ export class GameScene_3 extends BaseGameScene {
         objectPanel.show();
         objectPanel.setCloseCallBack(() => GameManager.backToMainStreet(this));
     }
+
 
 }
