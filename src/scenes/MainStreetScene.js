@@ -75,8 +75,11 @@ export class MainStreetScene extends Phaser.Scene {
         this.load.image('gametimer', 'assets/images/MainStreet/gameintro_timer.png');
 
         this.load.image('npc1_bubble_1', 'assets/images/Game_4/game4_npc_box1.png');
-        this.load.image('npc2_bubble_1', 'assets/images/Game_3/game3_npc_box1.png');
-        this.load.image('npc3_bubble_1', 'assets/images/Game_2/game2_npc_box1.png');
+
+        this.load.image('npc2_bubble_1', 'assets/images/Game_2/game2_npc_box1.png');
+        this.load.image('npc2_bubble_2', 'assets/images/Game_2/game2_npc_box2.png');
+
+        this.load.image('npc3_bubble_1', 'assets/images/Game_3/game3_npc_box1.png');
         this.load.image('npc4_bubble_1', 'assets/images/Game_1/game1_npc_box1.png');
         this.load.image('npc5_bubble_1', 'assets/images/Game_5/game5_npc_box1.png');
         this.load.image('npc6_bubble_1', 'assets/images/Game_6/game6_npc_box1.png');
@@ -177,7 +180,7 @@ export class MainStreetScene extends Phaser.Scene {
         //        this.add.image(4150, 600, 'stage_door').setOrigin(0.5, 0.5).setDepth(15);
 
         // 設定相機邊界為總長度 8414px
-        this.cameras.main.setBounds(0, 0, 4200, 1080);
+        this.cameras.main.setBounds(0, 0, 4100, 1080);
 
         const introPage = [
             {
@@ -230,7 +233,7 @@ export class MainStreetScene extends Phaser.Scene {
 
         this.bubbleTimers = [];
         const npc1_bubbles = ['npc1_bubble_1'];
-        const npc2_bubbles = ['npc2_bubble_1'];
+        const npc2_bubbles = ['npc2_bubble_1', 'npc2_bubble_2'];
         const npc3_bubbles = ['npc3_bubble_1'];
         const npc4_bubbles = ['npc4_bubble_1'];
         const npc5_bubbles = ['npc5_bubble_1'];
@@ -260,10 +263,11 @@ export class MainStreetScene extends Phaser.Scene {
             this.isRightDown = false;
         });
 
+        const npcGameMap = { 1: 4, 2: 2, 3: 3, 4: 1, 5: 5 };
         this.interactiveNpcs.forEach((npc, index) => {
             npc.on('pointerdown', () => {
                 if (npc.canInteract) {
-                    const gameNumber = index + 1;
+                    const gameNumber = npcGameMap[npc.id] ?? (index + 1);
                     const sceneKey = `GameScene_${gameNumber}`;
                     const characterbubble = `game${gameNumber}_${genderKey}_bubble`;
                     this.loadBubble(0, npc.bubbles, sceneKey, npc, characterbubble);
@@ -271,8 +275,7 @@ export class MainStreetScene extends Phaser.Scene {
             });
         });
 
-
-        this.playerSprite = this.add.sprite(600, 3500,
+        this.playerSprite = this.add.sprite(600, 600,
             `${genderKey}_idle`).setDepth(14).setScale(2);
 
         this.playerSprite.anims.play(`${genderKey}_idle_anim`);
@@ -301,7 +304,7 @@ export class MainStreetScene extends Phaser.Scene {
         }
         this.playerSprite.lastDirectionLeft = isLeft;
 
-        this.playerSprite.x = Phaser.Math.Clamp(this.playerSprite.x, 600, 5300);
+        this.playerSprite.x = Phaser.Math.Clamp(this.playerSprite.x, 600, 3800);
 
 
         const allNpcs = [...this.interactiveNpcs];
@@ -428,27 +431,21 @@ export class MainStreetScene extends Phaser.Scene {
             this.bubbleImg.destroy();
             this.currentActiveBubble = null;
 
-            // Store this timer so we can stop it
-            const timer1 = this.time.delayedCall(500, () => {
-                // IMPORTANT: Check if the player is still "allowed" to see this
-                if (!targetNpc.canInteract) return;
+            // If there is another bubble in the sequence, show it instead of the character bubble.
+            if (index < bubbles.length - 1) {
+                this.loadBubble(index + 1, bubbles, sceneKey, targetNpc, characterbubble);
+                return;
+            }
 
-                this.characterBubbleImg.setVisible(true);
-                this.characterBubbleImg.on('pointerdown', () => {
-                    this.characterBubbleImg.destroy();
-                    this.characterActiveBubble = null;
-
-                    const timer2 = this.time.delayedCall(1000, () => {
-                        if (sceneKey && targetNpc.canInteract) {
-                            localStorage.setItem('playerPosition', JSON.stringify({ x: this.playerSprite.x, y: this.playerSprite.y }));
-                            GameManager.switchToGameScene(this, sceneKey);
-                        }
-                    });
-                    this.bubbleTimers.push(timer2);
-                });
+            this.time.delayedCall(500, () => {
+                if (sceneKey && targetNpc.canInteract) {
+                    localStorage.setItem('playerPosition', JSON.stringify({ x: this.playerSprite.x, y: this.playerSprite.y }));
+                    GameManager.switchToGameScene(this, sceneKey);
+                }
             });
-            this.bubbleTimers.push(timer1);
         });
+
+        // Store this timer so we can stop i
 
         // 彈出動畫
         this.tweens.add({
@@ -471,7 +468,7 @@ export class MainStreetScene extends Phaser.Scene {
         // NPC Animations
         this.anims.create({
             key: 'npc1_anim',
-            frames: this.anims.generateFrameNumbers('npc1', { start: 0, end: 70 }),
+            frames: this.anims.generateFrameNumbers('npc1', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
