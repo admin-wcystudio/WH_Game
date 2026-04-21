@@ -18,27 +18,20 @@ export class GameScene_6 extends BaseGameScene {
         this.load.image('confirm_button_select', `${path}game6_confirm_button_select.png`);
 
         if (this.genderKey === 'boy') {
-            this.load.image('game6_npc_box_intro', `${path}game6_npc_boy_box3.png`);
+            this.load.image(`game6_bg`, `assets/images/Game_6/game6_bg_boy.png`);
         } else {
-            this.load.image('game6_npc_box_intro', `${path}game6_npc_girl_box3.png`);
+            this.load.image(`game6_bg`, `assets/images/Game_6/game6_bg_girl.png`);
         }
 
-        this.load.image('game6_npc_box_win', `${path}game6_npc_box4.png`);
-        this.load.image('game6_npc_box_tryagain', `${path}game6_npc_box7.png`);
+        this.load.image('game6_npc_box_mainstreet', `${path}game6_npc_box1.png`);
+        this.load.image('game6_npc_box_win', `${path}game6_npc_box2.png`);
+        this.load.image('game6_npc_box_win_01', `${path}game6_npc_box3.png`);
+        this.load.image('game6_npc_box_tryagain', `${path}game6_npc_box4.png`);
 
-        this.load.image('game6_boy_npc_box1', `${path}game6_npc_boy_box3.png`);
-        this.load.image('game5_boy_npc_box2', `${path}game6_npc_boy_box5.png`);
+        this.load.image('game6_npc_box_anim_01', `${path}game6_npc_box5.png`);
+        this.load.image('game6_npc_box_anim_02', `${path}game6_npc_box6.png`);
+        this.load.image('game6_npc_box_anim_03', `${path}game6_npc_box7.png`);
 
-        this.load.image('game6_girl_npc_box1', `${path}game6_npc_girl_box3.png`);
-        this.load.image('game6_girl_npc_box2', `${path}game6_npc_girl_box5.png`);
-
-
-        for (let i = 1; i <= 8; i++) {
-            this.load.image(`game6_object${i}`, `${path}game6_object${i}.png`);
-        }
-
-        this.load.image('game6_border1', `${path}game6_border1.png`);
-        this.load.image('game6_border2', `${path}game6_border2.png`);
 
     }
 

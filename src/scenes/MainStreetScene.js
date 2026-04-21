@@ -71,8 +71,6 @@ export class MainStreetScene extends Phaser.Scene {
         this.load.image('stage1', 'assets/images/MainStreet/stage1.png');
         this.load.image('stage2', 'assets/images/MainStreet/stage2.png');
         this.load.image('stage3', 'assets/images/MainStreet/stage3.png');
-        this.load.image('stage4', 'assets/images/MainStreet/stage4.png');
-        this.load.image('stage_door', 'assets/images/MainStreet/stage_door.png');
         this.load.image('gameintro_01', 'assets/images/MainStreet/gameintro.png');
         this.load.image('gametimer', 'assets/images/MainStreet/gameintro_timer.png');
 
@@ -82,32 +80,6 @@ export class MainStreetScene extends Phaser.Scene {
         this.load.image('npc4_bubble_1', 'assets/images/Game_1/game1_npc_box1.png');
         this.load.image('npc5_bubble_1', 'assets/images/Game_5/game5_npc_box1.png');
         this.load.image('npc6_bubble_1', 'assets/images/Game_6/game6_npc_box1.png');
-        this.load.image('npc7_bubble_1', 'assets/images/Game_7/game7_npc_box3.png');
-
-        //character bubbles
-
-        // Character bubbles for games 1 to 6
-
-        this.load.image('game1_girl_bubble', 'assets/images/Game_1/game1_npc_girl_box2.png');
-        this.load.image('game1_boy_bubble', 'assets/images/Game_1/game1_npc_box2.png');
-
-        this.load.image('game2_girl_bubble', 'assets/images/Game_2/game2_npc_girl_box2.png');
-        this.load.image('game2_boy_bubble', 'assets/images/Game_2/game2_npc_box2.png');
-
-        this.load.image('game3_girl_bubble', 'assets/images/Game_3/game3_npc_girl_box2.png');
-        this.load.image('game3_boy_bubble', 'assets/images/Game_3/game3_npc_box2.png');
-
-        this.load.image('game4_girl_bubble', 'assets/images/Game_4/game4_npc_girl_box2.png');
-        this.load.image('game4_boy_bubble', 'assets/images/Game_4/game4_npc_box2.png');
-
-        this.load.image('game5_girl_bubble', 'assets/images/Game_5/game5_npc_girl_box2.png');
-        this.load.image('game5_boy_bubble', 'assets/images/Game_5/game5_npc_box2.png');
-
-        this.load.image('game6_girl_bubble', 'assets/images/Game_6/game6_npc_girl_box2.png');
-        this.load.image('game6_boy_bubble', 'assets/images/Game_6/game6_npc_box2.png');
-
-        this.load.image('game7_girl_bubble', 'assets/images/Game_7/game7_npc_girl.png');
-        this.load.image('game7_boy_bubble', 'assets/images/Game_7/game7_npc_boy.png');
 
 
 
@@ -123,15 +95,15 @@ export class MainStreetScene extends Phaser.Scene {
 
         if (gender === 'M') {
             this.load.spritesheet('boy_idle', 'assets/images/MainStreet/Boy/maincharacter_boy_middlestand.png',
-                { frameWidth: 600, frameHeight: 700 });
+                { frameWidth: 300, frameHeight: 350 });
             this.load.spritesheet('boy_left_talk', 'assets/images/MainStreet/Boy/maincharacter_boy_lefttalking.png',
-                { frameWidth: 600, frameHeight: 700 });
+                { frameWidth: 300, frameHeight: 350 });
             this.load.spritesheet('boy_right_talk', 'assets/images/MainStreet/Boy/maincharacter_boy_righttalking.png',
-                { frameWidth: 600, frameHeight: 700 });
+                { frameWidth: 300, frameHeight: 350 });
             this.load.spritesheet('boy_left_walk', 'assets/images/MainStreet/Boy/maincharacter_boy_leftwalk.png',
-                { frameWidth: 600, frameHeight: 700 });
+                { frameWidth: 300, frameHeight: 350 });
             this.load.spritesheet('boy_right_walk', 'assets/images/MainStreet/Boy/maincharacter_boy_rightwalk.png',
-                { frameWidth: 600, frameHeight: 700 });
+                { frameWidth: 300, frameHeight: 350 });
         }
 
         if (gender === 'F') {
@@ -148,35 +120,30 @@ export class MainStreetScene extends Phaser.Scene {
         }
 
         // // NPC spritesheets
-        this.load.spritesheet('npc1', 'assets/images/MainStreet/NPCs/NPC1.png',
-            { frameWidth: 195, frameHeight: 240 });
-        this.load.spritesheet('npc1_glow', 'assets/images/MainStreet/NPCs/NPC1_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
+        this.load.spritesheet('npc1', 'assets/images/MainStreet/NPCs/NPC1.png', {
+            frameWidth: 173,
+            frameHeight: 241
+        });
+        this.load.spritesheet('npc1_glow', 'assets/images/MainStreet/NPCs/NPC1_glow.png', {
+            frameWidth: 173,
+            frameHeight: 241
+        });
         this.load.spritesheet('npc2', 'assets/images/MainStreet/NPCs/NPC2.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 152, frameHeight: 232 });
         this.load.spritesheet('npc2_glow', 'assets/images/MainStreet/NPCs/NPC2_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 152, frameHeight: 232 });
         this.load.spritesheet('npc3', 'assets/images/MainStreet/NPCs/NPC3.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 202, frameHeight: 225 });
         this.load.spritesheet('npc3_glow', 'assets/images/MainStreet/NPCs/NPC3_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 202, frameHeight: 225 });
         this.load.spritesheet('npc4', 'assets/images/MainStreet/NPCs/NPC4.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 134, frameHeight: 216 });
         this.load.spritesheet('npc4_glow', 'assets/images/MainStreet/NPCs/NPC4_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 134, frameHeight: 216 });
         this.load.spritesheet('npc5', 'assets/images/MainStreet/NPCs/NPC5.png',
-            { frameWidth: 195, frameHeight: 240 });
+            { frameWidth: 208, frameHeight: 296 });
         this.load.spritesheet('npc5_glow', 'assets/images/MainStreet/NPCs/NPC5_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
-        this.load.spritesheet('npc6', 'assets/images/MainStreet/NPCs/NPC6.png',
-            { frameWidth: 195, frameHeight: 240 });
-        this.load.spritesheet('npc6_glow', 'assets/images/MainStreet/NPCs/NPC6_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
-        this.load.spritesheet('npc7', 'assets/images/MainStreet/NPCs/NPC7.png',
-            { frameWidth: 195, frameHeight: 240 });
-        this.load.spritesheet('npc7_glow', 'assets/images/MainStreet/NPCs/NPC7_glow.png',
-            { frameWidth: 195, frameHeight: 240 });
-
+            { frameWidth: 208, frameHeight: 296 });
     }
 
     create() {
@@ -200,14 +167,14 @@ export class MainStreetScene extends Phaser.Scene {
 
         console.log(`Player gender: ${gender}, genderKey: ${genderKey}`);
 
-        const bgKeys = ['stage1', 'stage2', 'stage3', 'stage4'];
+        const bgKeys = ['stage1', 'stage2', 'stage3'];
         let currentX = 0;
         //background
         bgKeys.forEach((key, index) => {
             const bg = this.add.image(currentX, 540, key).setOrigin(0, 0.5).setDepth(1);
-            currentX += bg.width; // 累加寬度，讓下一張接在後面
+            currentX += bg.width;
         });
-        this.add.image(4150, 600, 'stage_door').setOrigin(0.5, 0.5).setDepth(15);
+        //        this.add.image(4150, 600, 'stage_door').setOrigin(0.5, 0.5).setDepth(15);
 
         // 設定相機邊界為總長度 8414px
         this.cameras.main.setBounds(0, 0, 5500, 1080);
@@ -572,34 +539,6 @@ export class MainStreetScene extends Phaser.Scene {
         this.anims.create({
             key: 'npc5_glow_anim',
             frames: this.anims.generateFrameNumbers('npc5_glow', { start: 0, end: 80 }),
-            frameRate: 30,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: 'npc6_anim',
-            frames: this.anims.generateFrameNumbers('npc6', { start: 0, end: 94 }),
-            frameRate: 30,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: 'npc6_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc6_glow', { start: 0, end: 94 }),
-            frameRate: 30,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: 'npc7_anim',
-            frames: this.anims.generateFrameNumbers('npc7', { start: 0, end: 94 }),
-            frameRate: 30,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: 'npc7_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc7_glow', { start: 0, end: 94 }),
             frameRate: 30,
             repeat: -1
         });
