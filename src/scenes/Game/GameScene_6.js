@@ -246,32 +246,19 @@ export class GameScene_6 extends BaseGameScene {
             this.fallingArrows[i].destroy();
         }
         this.fallingArrows = [];
+        this.canSpawn = false;
+        this.spawnHitPoint = false;
+        this.isHitPointValid = false;
+        this.enableGameInteraction(false);
 
-        this.barBG.setVisible(false);
-        this.hitPoint.setVisible(false);
-
-        // Handle result
         if (winRound) {
-            this.currentIndex = Math.min(this.targetRounds, this.currentIndex + 1);
-            this.updateProgressBar(false);
-            this.canSpawn = false;
-            this.spawnHitPoint = false;
-            this.isHitPointValid = false;
-            if (this.hitPoint) {
-                this.hitPoint.setVisible(false);
-            }
-            if (this.barBG) {
-                this.barBG.setVisible(false);
-            }
+            this.currentIndex++;
+
             this.onRoundWin();
         } else {
-            this.updateProgressBar(true);
-            this.canSpawn = false;
-            this.spawnHitPoint = false;
-            this.isHitPointValid = false;
-            this.enableGameInteraction(false);
             this.handleLose();
         }
+        this.updateProgressBar(true);
     }
 
     updateProgressBar(showFail = false) {
@@ -295,7 +282,7 @@ export class GameScene_6 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
-        let isFinalWin = (this.currentIndex >= this.targetRounds);
+        let isFinalWin = (this.roundIndex >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
         this.gameTimer.stop();
         this.enableGameInteraction(false);
@@ -303,8 +290,10 @@ export class GameScene_6 extends BaseGameScene {
         if (isFinalWin) {
             this.showBubble('win');
             this.showFeedbackLabel(true);
-        }else{
-            
+        } else {
+            this.roundIndex = this.currentIndex;
+            this.canSpawn = true;
+            this.enableGameInteraction(true);
         }
 
         this.updateRoundUI(true);
