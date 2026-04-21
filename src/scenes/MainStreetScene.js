@@ -133,13 +133,13 @@ export class MainStreetScene extends Phaser.Scene {
         this.load.spritesheet('npc2_glow', 'assets/images/MainStreet/NPCs/NPC2_glow.png',
             { frameWidth: 152, frameHeight: 232 });
         this.load.spritesheet('npc3', 'assets/images/MainStreet/NPCs/NPC3.png',
-            { frameWidth: 202, frameHeight: 225 });
+            { frameWidth: 202.5, frameHeight: 225.5 });
         this.load.spritesheet('npc3_glow', 'assets/images/MainStreet/NPCs/NPC3_glow.png',
             { frameWidth: 202, frameHeight: 225 });
         this.load.spritesheet('npc4', 'assets/images/MainStreet/NPCs/NPC4.png',
-            { frameWidth: 134, frameHeight: 216 });
+            { frameWidth: 134.5, frameHeight: 216 });
         this.load.spritesheet('npc4_glow', 'assets/images/MainStreet/NPCs/NPC4_glow.png',
-            { frameWidth: 134, frameHeight: 216 });
+            { frameWidth: 134.5, frameHeight: 216 });
         this.load.spritesheet('npc5', 'assets/images/MainStreet/NPCs/NPC5.png',
             { frameWidth: 208, frameHeight: 296 });
         this.load.spritesheet('npc5_glow', 'assets/images/MainStreet/NPCs/NPC5_glow.png',
@@ -177,7 +177,7 @@ export class MainStreetScene extends Phaser.Scene {
         //        this.add.image(4150, 600, 'stage_door').setOrigin(0.5, 0.5).setDepth(15);
 
         // 設定相機邊界為總長度 8414px
-        this.cameras.main.setBounds(0, 0, 5500, 1080);
+        this.cameras.main.setBounds(0, 0, 4200, 1080);
 
         const introPage = [
             {
@@ -234,27 +234,23 @@ export class MainStreetScene extends Phaser.Scene {
         const npc3_bubbles = ['npc3_bubble_1'];
         const npc4_bubbles = ['npc4_bubble_1'];
         const npc5_bubbles = ['npc5_bubble_1'];
-        const npc6_bubbles = ['npc6_bubble_1'];
-        const npc7_bubbles = ['npc7_bubble_1'];
 
         // NPCs (trigger game)
         this.interactiveNpcs = [];
 
-        const n1 = NpcHelper.createNpc(this, 1, 850, 550, 1, 'npc1', npc1_bubbles, 6, 'npc1_anim');
-        const n2 = NpcHelper.createNpc(this, 2, 1450, 550, 1, 'npc2', npc2_bubbles, 6, 'npc2_anim');
-        const n3 = NpcHelper.createNpc(this, 3, 2800, 550, 1, 'npc3', npc3_bubbles, 6, 'npc3_anim');
-        const n4 = NpcHelper.createNpc(this, 4, 3350, 550, 1, 'npc4', npc4_bubbles, 6, 'npc4_anim');
-        const n5 = NpcHelper.createNpc(this, 5, 3800, 750, 1, 'npc5', npc5_bubbles, 15, 'npc5_anim');
-        const n6 = NpcHelper.createNpc(this, 6, 4700, 550, 1, 'npc6', npc6_bubbles, 6, 'npc6_anim');
-        const n7 = NpcHelper.createNpc(this, 7, 5100, 550, 1, 'npc7', npc7_bubbles, 6, 'npc7_anim');
+        const n1 = NpcHelper.createNpc(this, 1, 380, 550, 1, 'npc1', npc1_bubbles, 6, 'npc1_anim');
+        const n2 = NpcHelper.createNpc(this, 2, 1180, 550, 1, 'npc2', npc2_bubbles, 6, 'npc2_anim');
+        const n3 = NpcHelper.createNpc(this, 3, 1780, 550, 1, 'npc3', npc3_bubbles, 6, 'npc3_anim');
+        const n4 = NpcHelper.createNpc(this, 4, 2680, 550, 1, 'npc4', npc4_bubbles, 6, 'npc4_anim');
+        const n5 = NpcHelper.createNpc(this, 5, 3500, 750, 1, 'npc5', npc5_bubbles, 15, 'npc5_anim');
+
 
         this.interactiveNpcs.push(n1);
         this.interactiveNpcs.push(n2);
         this.interactiveNpcs.push(n3);
         this.interactiveNpcs.push(n4);
         this.interactiveNpcs.push(n5);
-        this.interactiveNpcs.push(n6);
-        this.interactiveNpcs.push(n7);
+
 
         this.currentInteractiveNpc = null;
 
@@ -276,7 +272,7 @@ export class MainStreetScene extends Phaser.Scene {
         });
 
 
-        this.playerSprite = this.add.sprite(600, 600,
+        this.playerSprite = this.add.sprite(600, 3500,
             `${genderKey}_idle`).setDepth(14).setScale(2);
 
         this.playerSprite.anims.play(`${genderKey}_idle_anim`);
@@ -482,63 +478,63 @@ export class MainStreetScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'npc1_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc1_glow', { start: 0, end: 70 }),
+            frames: this.anims.generateFrameNumbers('npc1_glow', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc2_anim',
-            frames: this.anims.generateFrameNumbers('npc2', { start: 0, end: 68 }),
+            frames: this.anims.generateFrameNumbers('npc2', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc2_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc2_glow', { start: 0, end: 68 }),
+            frames: this.anims.generateFrameNumbers('npc2_glow', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc3_anim',
-            frames: this.anims.generateFrameNumbers('npc3', { start: 0, end: 75 }),
+            frames: this.anims.generateFrameNumbers('npc3', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc3_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc3_glow', { start: 0, end: 75 }),
+            frames: this.anims.generateFrameNumbers('npc3_glow', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc4_anim',
-            frames: this.anims.generateFrameNumbers('npc4', { start: 0, end: 94 }),
+            frames: this.anims.generateFrameNumbers('npc4', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc4_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc4_glow', { start: 0, end: 94 }),
+            frames: this.anims.generateFrameNumbers('npc4_glow', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc5_anim',
-            frames: this.anims.generateFrameNumbers('npc5', { start: 0, end: 80 }),
+            frames: this.anims.generateFrameNumbers('npc5', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc5_glow_anim',
-            frames: this.anims.generateFrameNumbers('npc5_glow', { start: 0, end: 80 }),
+            frames: this.anims.generateFrameNumbers('npc5_glow', { start: 0, end: 48 }),
             frameRate: 30,
             repeat: -1
         });
