@@ -14,16 +14,16 @@ export class GameScene_6 extends BaseGameScene {
         const player = JSON.parse(localStorage.getItem('player') || '{"gender":"M"}');
         this.genderKey = player.gender === 'M' ? 'boy' : 'girl';
 
-        this.load.image('confirm_button', `${path}game6_confirm_button.png`);
-        this.load.image('confirm_button_select', `${path}game6_confirm_button_select.png`);
-
         if (this.genderKey === 'boy') {
             this.load.image(`game6_bg`, `assets/images/Game_6/game6_bg_boy.png`);
+            this.load.image('game6_progress_icon', `${path}game6_progress_bar_boy.png`);
         } else {
             this.load.image(`game6_bg`, `assets/images/Game_6/game6_bg_girl.png`);
+            this.load.image('game6_progress_icon', `${path}game6_progress_bar_girl.png`);
         }
 
         this.load.image('game6_npc_box_mainstreet', `${path}game6_npc_box1.png`);
+        this.load.image('game6_npc_box_intro', `${path}game6_npc_box1.png`);
         this.load.image('game6_npc_box_win', `${path}game6_npc_box2.png`);
         this.load.image('game6_npc_box_win_01', `${path}game6_npc_box3.png`);
         this.load.image('game6_npc_box_tryagain', `${path}game6_npc_box4.png`);
@@ -32,6 +32,30 @@ export class GameScene_6 extends BaseGameScene {
         this.load.image('game6_npc_box_anim_02', `${path}game6_npc_box6.png`);
         this.load.image('game6_npc_box_anim_03', `${path}game6_npc_box7.png`);
 
+
+        // Buttons
+        this.load.image('game6_arrow_blue', `${path}game6_arrow_blue.png`);
+        this.load.image('game6_arrow_green', `${path}game6_arrow_green.png`);
+        this.load.image('game6_arrow_red', `${path}game6_arrow_red.png`);
+        this.load.image('game6_arrow_yellow', `${path}game6_arrow_yellow.png`);
+
+        // Arrows
+        this.load.image('game6_bar_arrow_blue', `${path}game6_bar_arrow_blue.png`);
+        this.load.image('game6_bar_arrow_green', `${path}game6_bar_arrow_green.png`);
+        this.load.image('game6_bar_arrow_red', `${path}game6_bar_arrow_red.png`);
+        this.load.image('game6_bar_arrow_yellow', `${path}game6_bar_arrow_yellow.png`);
+
+
+        // Other UI
+        this.load.image('game6_bar_bg', `${path}game6_bar_bg.png`);
+        this.load.image('game6_progress_bar', `${path}game6_progress_bar.png`);
+        this.load.image('game6_progress_bar_fail', `${path}game6_progress_bar_fail.png`);
+        this.load.image('game6_progress_bar_success', `${path}game6_progress_bar_success.png`);
+
+        this.load.image('game6_hit_point', `${path}game6_hit_point.png`);
+        this.load.image('game6_hit_button', `${path}game6_hit_button.png`);
+        this.load.image('game6_hit_button_select', `${path}game6_hit_button_select.png`);
+        this.load.video('game6_success_bg', `${path}game6_success_bg.mp4`, 'loadeddata', false, true);
 
     }
 
@@ -42,234 +66,263 @@ export class GameScene_6 extends BaseGameScene {
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
 
+        this.barBG = this.add.image(960, 540, 'game6_bar_bg').setDepth(20);
+        this.progressBar = this.add.image(960, 950, 'game6_progress_bar').setDepth(21);
+        this.progressIcon = this.add.image(960, 950, 'game6_progress_icon').setDepth(24);
+
         this.initGame('game6_bg', 'game6_description', false, false, {
-            targetRounds: 1,
-            roundPerSeconds: 60,
+            targetRounds: 3,
+            roundPerSeconds: 2000,
             isAllowRoundFail: false,
-            isContinuousTimer: false,
+            isContinuousTimer: true,
             sceneIndex: 6
         });
 
-        // Create confirm button
-        this.confirmBtn = new CustomButton(this, this.centerX, this.height - 100,
-            'confirm_button', 'confirm_button_select', () => {
-                this.checkAnswer();
-            });
-        this.confirmBtn.setDepth(600).setVisible(false);
     }
 
     setupGameObjects() {
+        this.canSpawn = false;
+        this.spawnHitPoint = false;
+        this.isHitPointValid = false;
+        this.isWin = false;
+        this.spawnSpeed = 5;
+        this.currentIndex = 0;
+        this.fallingArrows = [];
 
-        this.border1 = this.add.image(this.centerX - 400, this.centerY, 'game6_border1').setDepth(500).setVisible(true);
-        this.border2 = this.add.image(this.centerX + 400, this.centerY, 'game6_border2').setDepth(500).setVisible(true);
-
-        // Track which object is at each position
-        this.positionObjects = {};
-
-        // Border 1 (left) - 4 positions in a 2x2 grid
-        this.snapPositions = [
-            // Border 1 positions
-            { x: this.centerX - 485, y: this.centerY - 90, isOccupied: false },
-            { x: this.centerX - 320, y: this.centerY - 90, isOccupied: false },
-            { x: this.centerX - 485, y: this.centerY + 90, isOccupied: false },
-            { x: this.centerX - 320, y: this.centerY + 90, isOccupied: false },
-            // Border 2 positions (right)
-            { x: this.centerX + 320, y: this.centerY - 90, isOccupied: false },
-            { x: this.centerX + 485, y: this.centerY - 90, isOccupied: false },
-            { x: this.centerX + 320, y: this.centerY + 90, isOccupied: false },
-            { x: this.centerX + 485, y: this.centerY + 90, isOccupied: false }
-        ];
-
-        this.snapRadius = 90; // Distance threshold for snapping
-
-        const spawnPositions = [
-            { x: this.centerX - 780, y: this.centerY - 100 },
-            { x: this.centerX - 800, y: this.centerY + 100 },
-            { x: this.centerX, y: this.centerY + 200 },
-            { x: this.centerX, y: this.centerY - 200 },
-            { x: this.centerX + 100, y: this.centerY },
-            { x: this.centerX - 100, y: this.centerY },
-            { x: this.centerX + 800, y: this.centerY - 100 },
-            { x: this.centerX + 780, y: this.centerY + 100 }
-        ];
-
-
-
-        const shuffledPositions = Phaser.Utils.Array.Shuffle([...spawnPositions]);
-
-        this.objects = [];
-        for (let i = 1; i <= 8; i++) {
-            const pos = shuffledPositions[i - 1];
-            const obj = this.add.image(pos.x, pos.y, `game6_object${i}`)
-                .setDepth(505)
-                .setInteractive({ draggable: true })
-                .setVisible(false);
-
-            obj.objectId = i;
-            obj.originalX = pos.x;
-            obj.originalY = pos.y;
-
-            this.objects.push(obj);
+        if (this.buttonGroup) {
+            if (this.buttonGroup.scene) {
+                this.buttonGroup.destroy(true);
+            }
+        }
+        if (this.arrowGroup) {
+            if (this.arrowGroup.scene) {
+                this.arrowGroup.destroy(true);
+            }
         }
 
-        // Set up drag events
-        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+        this.buttonGroup = this.add.group();
+        this.arrowGroup = this.add.group();
+        const colors = ['blue', 'green', 'red', 'yellow'];
+        for (let i = 0; i < 4; i++) {
+            const button = new CustomButton(this, 520 + i * 300, 780, `game6_arrow_${colors[i]}`, `game6_arrow_${colors[i]}`,
+                () => {
+                    this.handleArrowClick(i);
+                }).setDepth(25);
+            this.buttonGroup.add(button);
+        }
 
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-        });
+        for (let i = 0; i < colors.length; i++) {
+            const arrow = this.add.image(960, -100, `game6_bar_arrow_${colors[i]}`).setDepth(23);
+            this.arrowGroup.add(arrow);
+        }
 
-        // Add dragend event for snapping
-        this.input.on('dragend', (pointer, gameObject) => {
-            const result = this.findNearestSnapPosition(gameObject.x, gameObject.y, gameObject);
-            if (result.snapPos) {
-                // Snap to position with animation
-                this.tweens.add({
-                    targets: gameObject,
-                    x: result.snapPos.x,
-                    y: result.snapPos.y,
-                    duration: 150,
-                    ease: 'Power2',
-                    onComplete: () => {
-                        // Check if all border 1 positions are occupied
-                        this.checkIfAllOccupied();
+    }
+    update() {
+        if (this.canSpawn) {
+            if (!this.fallingArrows || this.fallingArrows.length < 2) {
+                this.spawnArrow();
+            }
+
+            if (!this.fallingArrows) return;
+
+
+            if (!this.spawnHitPoint) {
+                this.time.delayedCall(1500, () => {
+                    if (this.canSpawn && !this.spawnHitPoint) {
+                        this.spawnHitPoint = true;
+                        this.showHitPoint();
                     }
                 });
-            } else {
-                console.log(`[SNAP] No snap position found within ${this.snapRadius}px radius`);
             }
-        });
+            // console.log('Hit point valid:', this.isHitPointValid);
 
-        this.border1_correctObjects = [2, 5, 6, 8];
-        this.border2_correctObjects = [1, 3, 4, 7];
-        //this.drawDebug();
-
-    }
-
-    findNearestSnapPosition(x, y, gameObject = null) {
-        let nearestPos = null;
-        let nearestIndex = -1;
-        let minDistance = this.snapRadius;
-
-        for (let i = 0; i < this.snapPositions.length; i++) {
-            const pos = this.snapPositions[i];
-            const distance = Phaser.Math.Distance.Between(x, y, pos.x, pos.y);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestPos = pos;
-                nearestIndex = i;
-            }
-        }
-
-        if (nearestPos && gameObject) {
-            // Remove this object from any previous position
-            Object.keys(this.positionObjects).forEach(key => {
-                if (this.positionObjects[key] === gameObject.objectId) {
-                    delete this.positionObjects[key];
-                    this.snapPositions[key].isOccupied = false;
+            for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
+                const arrow = this.fallingArrows[i];
+                arrow.x -= this.spawnSpeed;
+                if (arrow.x < 200) {
+                    arrow.destroy();
+                    this.fallingArrows.splice(i, 1);
                 }
-            });
-
-            // Track this object at the new position
-            this.positionObjects[nearestIndex] = gameObject.objectId;
-            nearestPos.isOccupied = true;
-
-            // Debug log for snap positions
-            if (nearestIndex >= 0 && nearestIndex <= 3) {
-                console.log(`[SNAP] Object ${gameObject.objectId} snapped to snapPosition[${nearestIndex}] at border1`);
-            } else if (nearestIndex >= 4 && nearestIndex <= 7) {
-                console.log(`[SNAP] Object ${gameObject.objectId} snapped to snapPosition[${nearestIndex}] at border2`);
             }
-        }
 
-        return { snapPos: nearestPos, index: nearestIndex };
-    }
-
-    checkIfAllOccupied() {
-        // Check if all positions (both borders) are occupied
-        const allPositions = [0, 1, 2, 3, 4, 5, 6, 7];
-        const allOccupied = allPositions.every(i => this.positionObjects.hasOwnProperty(i));
-
-        if (allOccupied) {
-            console.log('[CHECK] All positions occupied (both borders)!');
-            console.log('[CHECK] Current positions:', this.positionObjects);
-            console.log('[CHECK] Click confirm button to check answer');
         }
     }
 
     enableGameInteraction(enable) {
-        this.objects.forEach((obj, index) => {
-            obj.setVisible(enable);
-            obj.setInteractive(enable);
-            if (enable) {
-                console.log(`[INTERACTION] Object ${obj.objectId} at (${Math.round(obj.x)}, ${Math.round(obj.y)}) - visible: ${obj.visible}, interactive: ${obj.input ? obj.input.enabled : 'no input'}`);
-            }
-        });
-        if (this.confirmBtn) {
-            this.confirmBtn.setVisible(enable);
-            console.log(`[INTERACTION] Confirm button visibility: ${enable}`);
+
+        if (this.buttonGroup) {
+            this.buttonGroup.setVisible(enable);
+            this.buttonGroup.getChildren().forEach(button => {
+                if (enable) {
+                    button.setInteractive();
+                } else {
+                    button.disableInteractive();
+                }
+            });
         }
+        if (this.barBG)
+            this.barBG.setVisible(enable);
+
+        if (this.hitPoint)
+            this.hitPoint.setVisible(enable);
+
     }
 
-    checkAnswer() {
-        console.log('[ANSWER] Checking answer...');
+    showHitPoint() {
+        if (this.isWin) return;
 
-        // Check border 1 positions (0-3)
-        const border1Positions = [0, 1, 2, 3];
-        const border1Objects = border1Positions.map(i => this.positionObjects[i]).filter(id => id !== undefined);
+        this.hitPoint = this.add.image(1000, 520, 'game6_hit_point').setDepth(30);
+        this.hitPoint.setScale(0);
+        this.isHitPointValid = true;
+        this.tweens.add({
+            targets: this.hitPoint,
+            scale: 1,
+            duration: 500,
+            ease: 'Back.out'
+        });
 
-        // Check border 2 positions (4-7)
-        const border2Positions = [4, 5, 6, 7];
-        const border2Objects = border2Positions.map(i => this.positionObjects[i]).filter(id => id !== undefined)
-        // Check if border 1 has all correct objects
-        const border1Correct = this.border1_correctObjects.every(objId => border1Objects.includes(objId)) &&
-            border1Objects.length === this.border1_correctObjects.length;
 
-        // Check if border 2 has all correct objects
-        const border2Correct = this.border2_correctObjects.every(objId => border2Objects.includes(objId)) &&
-            border2Objects.length === this.border2_correctObjects.length;
+        this.time.delayedCall(2500, () => {
+            if (this.hitPoint) {
+                this.tweens.add({
+                    targets: this.hitPoint,
+                    scale: 0,
+                    duration: 500,
+                    ease: 'Back.in',
+                });;
+            }
+            this.isHitPointValid = false
+        });
 
-        if (border1Correct && border2Correct) {
-            console.log('[ANSWER] ✓ All objects correctly placed in both borders!');
+        this.time.delayedCall(2000, () => {
+            this.spawnHitPoint = false;
+        });
+    }
+
+    spawnArrow() {
+        if (!this.fallingArrows) this.fallingArrows = [];
+
+        const colors = ['blue', 'green', 'red', 'yellow'];
+        const gap = 200;
+        let startX = 1620;
+
+        if (this.fallingArrows.length > 0) {
+            const rightMostArrow = this.fallingArrows.reduce((
+                max, arrow) => arrow.x > max.x ? arrow : max, this.fallingArrows[0]);
+            startX = Math.max(rightMostArrow.x, 1920);
+        }
+
+        console.log('Spawning ');
+
+        for (let i = 1; i <= 12; i++) {
+            const randomIndex = Phaser.Math.Between(0, colors.length - 1);
+            const color = colors[randomIndex];
+            const arrow = this.add.image(startX + (i * gap), 540, `game6_bar_arrow_${color}`).setDepth(24);
+            arrow.colorIndex = randomIndex;
+            this.fallingArrows.push(arrow);
+        }
+
+    }
+
+    handleArrowClick(index) {
+        if (!this.fallingArrows || this.fallingArrows.length === 0) return;
+
+        // Find any arrow that matches the color and is within the hit zone
+        const hitIndex = this.fallingArrows.findIndex(arrow =>
+            arrow.x >= 900 && arrow.x <= 1100 && arrow.colorIndex === index
+        );
+        let winRound = false;
+
+        if (hitIndex !== -1 && this.isHitPointValid) {
+            const arrow = this.fallingArrows[hitIndex];
+            console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
+            winRound = true;
+        } else {
+            console.log("No matching arrow in hit zone / or hit point not valid");
+        }
+
+        // Common cleanup: destroy arrows, hitPoint, and hide barBG
+        for (let i = 0; i < this.fallingArrows.length; i++) {
+            this.fallingArrows[i].destroy();
+        }
+        this.fallingArrows = [];
+
+        this.barBG.setVisible(false);
+        this.hitPoint.setVisible(false);
+
+        // Handle result
+        if (winRound) {
+            this.currentIndex = Math.min(this.targetRounds, this.currentIndex + 1);
+            this.updateProgressBar(false);
+            this.canSpawn = false;
+            this.spawnHitPoint = false;
+            this.isHitPointValid = false;
+            if (this.hitPoint) {
+                this.hitPoint.setVisible(false);
+            }
+            if (this.barBG) {
+                this.barBG.setVisible(false);
+            }
             this.onRoundWin();
         } else {
-            console.log('[ANSWER] ✗ Incorrect placement!');
+            this.updateProgressBar(true);
+            this.canSpawn = false;
+            this.spawnHitPoint = false;
+            this.isHitPointValid = false;
+            this.enableGameInteraction(false);
             this.handleLose();
         }
     }
 
-    resetForNewRound() {
-        // Reset position tracking
-        this.positionObjects = {};
-        this.snapPositions.forEach(pos => pos.isOccupied = false);
+    updateProgressBar(showFail = false) {
+        if (!this.progressFail) {
+            this.progressFail = this.add.image(960, 950, 'game6_progress_bar_fail').setDepth(22).setScrollFactor(0);
+        }
+        if (!this.progressSuccess) {
+            this.progressSuccess = this.add.image(960, 950, 'game6_progress_bar_success').setDepth(23).setScrollFactor(0);
+        }
 
-        // Reset objects to original positions
-        this.objects.forEach(obj => {
-            obj.x = obj.originalX;
-            obj.y = obj.originalY;
-        });
+        if (!this.progressWidth) {
+            this.progressWidth = this.progressFail.displayWidth || this.progressFail.width || 1;
+        }
+
+        const successWidth = Math.floor(this.progressWidth * Math.min(1, this.currentIndex / this.targetRounds));
+        this.progressSuccess.setCrop(0, 0, successWidth, this.progressSuccess.height);
+        this.progressFail.setCrop(0, 0, showFail ? this.progressWidth : 0, this.progressFail.height);
+    }
+
+
+    onRoundWin() {
+        if (!this.isGameActive || this.gameState === 'gameWin') return;
+
+        let isFinalWin = (this.currentIndex >= this.targetRounds);
+        this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
+        this.gameTimer.stop();
+        this.enableGameInteraction(false);
+
+        if (isFinalWin) {
+            this.showBubble('win');
+            this.showFeedbackLabel(true);
+        }else{
+            
+        }
+
+        this.updateRoundUI(true);
+    }
+
+
+
+    onIntroBubbleClose() {
+        this.canSpawn = true;
     }
 
     showWin() {
-        this.objects.forEach(obj => obj.setVisible(false));
-        if (this.confirmBtn) this.confirmBtn.setVisible(false);
 
-        this.time.delayedCall(1500, () => {
-            GameManager.backToMainStreet(this);
-        });
     }
 
-    drawDebug() {
 
-        // Debug graphics - draw snap positions
-        this.debugGraphics = this.add.graphics();
-        this.debugGraphics.lineStyle(2, 0xff0000, 0.5);
-        this.debugGraphics.fillStyle(0xff0000, 0.2);
-        this.snapPositions.forEach(pos => {
-            this.debugGraphics.strokeCircle(pos.x, pos.y, 60); // Draw outer circle
-            this.debugGraphics.fillCircle(pos.x, pos.y, 5); // Draw center point
-        });
-        this.debugGraphics.setDepth(999); // Just below borders
+    resetForNewRound() {
 
     }
 }
+

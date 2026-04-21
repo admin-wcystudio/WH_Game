@@ -166,6 +166,7 @@ export default class BaseGameScene extends Phaser.Scene {
         if (type === 'intro') {
             this.currentBubbleImg.once('pointerdown', () => {
                 closeBubble();
+                this.onIntroBubbleClose();
                 this.startGame();
             });
         } else if (type === 'win') {
@@ -486,6 +487,10 @@ export default class BaseGameScene extends Phaser.Scene {
     }
 
     // --- Abstract Hooks (To be implemented by your 7 games) ---
+
+    onIntroBubbleClose() {
+
+    }
 
     setupGameObjects() {
         // Example: this.add.sprite(...) or this.physics.add.group(...)
