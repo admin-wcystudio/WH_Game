@@ -260,10 +260,14 @@ export class GameScene_6 extends BaseGameScene {
         this.enableGameInteraction(false);
 
         if (winRound) {
+
+            this.roundIndex = this.currentIndex;
             this.onRoundWin();
+            console.log('Round win! Current index:', this.currentIndex, this.roundIndex);
             this.currentIndex++;
 
         } else {
+            this.roundIndex = this.currentIndex;
             this.handleLose();
         }
         this.updateProgressBar(true);
@@ -290,9 +294,7 @@ export class GameScene_6 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
-        this.roundIndex = this.currentIndex;
-
-        let isFinalWin = (this.roundIndex >= this.targetRounds);
+        let isFinalWin = (this.roundIndex + 1 >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
         this.gameTimer.stop();
         this.enableGameInteraction(false);
@@ -311,10 +313,6 @@ export class GameScene_6 extends BaseGameScene {
 
     onIntroBubbleClose() {
         this.canSpawn = true;
-    }
-
-    showWin() {
-
     }
 
 
