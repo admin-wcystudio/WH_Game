@@ -44,6 +44,8 @@ export class GameResultScene extends Phaser.Scene {
 
         this.load.image('popup_01', `assets/images/Game_7/game7_popup1.png`);
         this.load.image('popup_02', `assets/images/Game_7/game7_popup2.png`);
+        this.load.image('receive_button', `assets/images/Game_7/game7_receive_button.png`);
+        this.load.image('receive_button_select', `assets/images/Game_7/game7_receive_button_select.png`);
 
 
         // Items (1-10)
@@ -177,39 +179,31 @@ export class GameResultScene extends Phaser.Scene {
     }
 
     showGame7Popup(isCompleted) {
-        const popup = new CustomPanel(this, 960, 540, [{
-            content: 'popup_01',
-            closeBtn: 'close_btn',
-            closeBtnClick: 'close_btn_click'
-        }]).setDepth(20);
-        popup.show();
-
-        this.time.delayedCall(
-            2000, () => {
-                popup.destroy();
-                this.showGame7Popup_02();
-            });
+        const popup = this.add.image(960, 540, 'popup_01').setDepth(20);
+        const receiveButton =
+            new CustomButton(this, 960, 750, 'receive_button', 'receive_button_select',
+                () => {
+                    this.time.delayedCall(
+                        2000, () => {
+                            popup.destroy();
+                            receiveButton.destroy();
+                            this.showGame7Popup_02();
+                        });
+                });
+        receiveButton.setDepth(21);
 
     }
 
-
     showGame7Popup_02() {
-        const popup = new CustomPanel(this, 960, 540, [{
-            content: 'popup_02',
-            closeBtn: 'close_btn',
-            closeBtnClick: 'close_btn_click'
-        }]).setDepth(20);
-        popup.show();
+        const popup = this.add.image(960, 540, 'popup_02').setDepth(20);
+        popup.setVisible(true);
 
-        popup.setCloseCallBack(() => {
-            popup.destroy();
-
-            this.time.delayedCall(
-                2000, () => {
-                    console.log("Game 7 not completed, returning to Game Scene 7");
-                    GameManager.switchToGameScene(this, 'GameScene_7');
-                });
-        });
+        this.time.delayedCall(
+            3000, () => {
+                popup.destroy();
+                console.log("Game 7 not completed, returning to Game Scene 7");
+                GameManager.switchToGameScene(this, 'GameScene_7');
+            });
     }
 
 }
