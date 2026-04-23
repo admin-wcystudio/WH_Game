@@ -187,7 +187,7 @@ export class GameResultScene extends Phaser.Scene {
                 this.button.setVisible(true);
             } else {
                 console.log("Game 7 not completed, returning to Game Scene 7");
-                GameManager.switchToGameScene(this, 'GameSCene_7');
+                GameManager.switchToGameScene(this, 'GameScene_7');
             }
         });
     }
