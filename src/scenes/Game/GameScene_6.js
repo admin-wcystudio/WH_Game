@@ -2,6 +2,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import { use } from 'matter';
 
 
 export class GameScene_6 extends BaseGameScene {
@@ -316,6 +317,44 @@ export class GameScene_6 extends BaseGameScene {
     onIntroBubbleClose() {
         this.canSpawn = true;
     }
+
+    onWinBubbleClose() {
+        const dialogY = this.cameras.main.height * 0.8;
+        this.winVideo = this.add.video(960, 540, 'game6_success_bg').setDepth(30);
+        this.winVideo.play(true);
+        this.winVideo.on('complete', () => {
+            // this.winVideo.destroy();
+            this.animDialog_01 = this.add.image(960, dialogY,
+                'game6_npc_box_anim_01').setDepth(31);
+
+            this.animDialog_01.setInteractive({ useHandCursor: true })
+                .on('pointerdown', () => {
+                    if (this.animDialog_01) {
+                        this.animDialog_01.destroy();
+                    }
+                    this.animDialog_02 = this.add.image(960, dialogY,
+                        'game6_npc_box_anim_02').setDepth(31);
+                    this.animDialog_02.setInteractive({ useHandCursor: true })
+                        .on('pointerdown', () => {
+                            if (this.animDialog_02) {
+                                this.animDialog_02.destroy();
+                            }
+                            this.animDialog_03 = this.add.image(960, dialogY,
+                                'game6_npc_box_anim_03').setDepth(31);
+                            this.animDialog_03.setInteractive({ useHandCursor: true })
+                                .on('pointerdown', () => {
+                                    if (this.animDialog_03) {
+                                        this.animDialog_03.destroy();
+                                    }
+
+                                    GameManager.switchToGameScene(this, 'GameScene_7');
+
+                                });
+                        })
+                });
+        });
+    }
+
 
 
     resetForNewRound() {
