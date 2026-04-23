@@ -319,7 +319,39 @@ export class GameScene_6 extends BaseGameScene {
 
 
     resetForNewRound() {
+        this.canSpawn = false;
+        this.spawnHitPoint = false;
+        this.isHitPointValid = false;
+        this.isWin = false;
+        this.currentIndex = 0;
 
+        if (this.hitPointTimer) {
+            this.hitPointTimer.remove(false);
+            this.hitPointTimer = null;
+        }
+
+        if (this.hitPoint) {
+            this.hitPoint.setVisible(false).setScale(0);
+        }
+
+        if (this.fallingArrows) {
+            for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
+                const arrow = this.fallingArrows[i];
+                if (arrow) {
+                    arrow.destroy();
+                }
+            }
+        }
+        this.fallingArrows = [];
+
+        if (this.progressSuccess) {
+            this.progressSuccess.destroy();
+            this.progressSuccess = null;
+        }
+        if (this.progressFail) {
+            this.progressFail.destroy();
+            this.progressFail = null;
+        }
     }
 }
 
