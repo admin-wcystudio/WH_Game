@@ -69,6 +69,8 @@ export class GameScene_6 extends BaseGameScene {
         this.barBG = this.add.image(960, 540, 'game6_bar_bg').setDepth(20);
         this.progressBar = this.add.image(960, 950, 'game6_progress_bar').setDepth(21);
         this.progressIcon = this.add.image(960, 950, 'game6_progress_icon').setDepth(24);
+        this.hitPoint = this.add.image(1000, 520, 'game6_hit_point').setDepth(30)
+            .setVisible(false).setScale(0);
 
         this.initGame('game6_bg', 'game6_description', false, false, {
             targetRounds: 3,
@@ -88,6 +90,7 @@ export class GameScene_6 extends BaseGameScene {
         this.spawnSpeed = 5;
         this.currentIndex = 0;
         this.fallingArrows = [];
+        this.hitPointTimer = null;
 
         if (this.buttonGroup) {
             if (this.buttonGroup.scene) {
@@ -126,11 +129,12 @@ export class GameScene_6 extends BaseGameScene {
             if (!this.fallingArrows) return;
 
 
-            if (!this.spawnHitPoint) {
-                this.time.delayedCall(1500, () => {
+            if (!this.spawnHitPoint && !this.hitPointTimer) {
+                this.hitPointTimer = this.time.delayedCall(1500, () => {
+                    this.hitPointTimer = null;
                     if (this.canSpawn && !this.spawnHitPoint) {
-                        this.spawnHitPoint = true;
                         this.showHitPoint();
+                        this.spawnHitPoint = true;
                     }
                 });
             }
@@ -169,10 +173,8 @@ export class GameScene_6 extends BaseGameScene {
     }
 
     showHitPoint() {
-        if (this.isWin) return;
+        if (this.isWin || this.spawnHitPoint) return;
 
-        this.hitPoint = this.add.image(1000, 520, 'game6_hit_point').setDepth(30);
-        this.hitPoint.setScale(0);
         this.isHitPointValid = true;
         this.tweens.add({
             targets: this.hitPoint,
@@ -249,12 +251,18 @@ export class GameScene_6 extends BaseGameScene {
         this.canSpawn = false;
         this.spawnHitPoint = false;
         this.isHitPointValid = false;
+
+        if (this.hitPointTimer) {
+            this.hitPointTimer.remove(false);
+            this.hitPointTimer = null;
+        }
+
         this.enableGameInteraction(false);
 
         if (winRound) {
+            this.onRoundWin();
             this.currentIndex++;
 
-            this.onRoundWin();
         } else {
             this.handleLose();
         }
@@ -282,6 +290,8 @@ export class GameScene_6 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
+        this.roundIndex = this.currentIndex;
+
         let isFinalWin = (this.roundIndex >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
         this.gameTimer.stop();
@@ -291,11 +301,9 @@ export class GameScene_6 extends BaseGameScene {
             this.showBubble('win');
             this.showFeedbackLabel(true);
         } else {
-            this.roundIndex = this.currentIndex;
             this.canSpawn = true;
             this.enableGameInteraction(true);
         }
-
         this.updateRoundUI(true);
     }
 
