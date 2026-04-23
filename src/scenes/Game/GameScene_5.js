@@ -93,7 +93,11 @@ export class GameScene_5 extends BaseGameScene {
 
     showWin() {
         this.questionPanel.setVisible(false);
-
+        this.time.delayedCall(
+            1500, () => {
+                console.log("Game 5 completed, switching to Game Result Scene");
+                GameManager.switchToGameScene(this, 'GameScene_6');
+            });
     }
 
     onRoundWin() {
@@ -116,7 +120,7 @@ export class GameScene_5 extends BaseGameScene {
 
         this.time.delayedCall(
             2000, () => {
-                this.showBubble('win', this.playerGender);
+                this.showBubble('win');
             });
 
 
