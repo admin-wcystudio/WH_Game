@@ -138,7 +138,7 @@ export class GameScene_6 extends BaseGameScene {
                     }
                 });
             }
-            // console.log('Hit point valid:', this.isHitPointValid);
+            //console.log('Hit point valid:', this.isHitPointValid);
 
             for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
                 const arrow = this.fallingArrows[i];
@@ -193,7 +193,9 @@ export class GameScene_6 extends BaseGameScene {
                     ease: 'Back.in',
                 });;
             }
-            this.isHitPointValid = false
+            this.time.delayedCall(500, () => {
+                this.isHitPointValid = false;
+            });
         });
 
         this.time.delayedCall(2000, () => {
@@ -203,7 +205,7 @@ export class GameScene_6 extends BaseGameScene {
 
     spawnArrow() {
         if (!this.fallingArrows) this.fallingArrows = [];
-        console.log('Spawning Arrow ');
+        //console.log('Spawning Arrow ');
         const colors = ['blue', 'green', 'red', 'yellow'];
         const gap = 200;
         let startX = 1620;
@@ -237,10 +239,10 @@ export class GameScene_6 extends BaseGameScene {
 
         if (hitIndex !== -1 && this.isHitPointValid) {
             const arrow = this.fallingArrows[hitIndex];
-            console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
+            // console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
             winRound = true;
         } else {
-            console.log("No matching arrow in hit zone / or hit point not valid");
+            // console.log("No matching arrow in hit zone / or hit point not valid");
         }
 
         // Common cleanup: destroy arrows, hitPoint, and hide barBG
@@ -263,7 +265,7 @@ export class GameScene_6 extends BaseGameScene {
 
             this.roundIndex = this.currentIndex;
             this.onRoundWin();
-            console.log('Round win! Current index:', this.currentIndex, this.roundIndex);
+            // console.log('Round win! Current index:', this.currentIndex, this.roundIndex);
             this.currentIndex++;
 
         } else {
