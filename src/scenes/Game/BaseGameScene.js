@@ -55,7 +55,7 @@ export default class BaseGameScene extends Phaser.Scene {
      * @param {boolean} autoStart - Auto start game
      * @param {object} customConfig - Custom configuration object
      */
-    initGame(bgKey, descriptionKey, skipIntroBubble = false, autoStart = false, customConfig = {}) {
+    initGame(bgKey, descriptionKey = null, skipIntroBubble = false, autoStart = false, customConfig = {}) {
 
         if (customConfig) {
             this.targetRounds = customConfig.targetRounds ?? this.targetRounds;
@@ -81,7 +81,8 @@ export default class BaseGameScene extends Phaser.Scene {
         this.gameUI = UIHelper.createGameCommonUI(this, bgKey,
             descriptionPages, this.targetRounds, this.config.depthUI);
 
-        this.gameUI.descriptionPanel.show();
+        if (descriptionKey)
+            this.gameUI.descriptionPanel.show();
 
         console.log('Game UI Initialized');
 
@@ -223,6 +224,7 @@ export default class BaseGameScene extends Phaser.Scene {
     }
 
     _formatDescription(key) {
+        if (!key) return null;
         const keys = Array.isArray(key) ? key : [key];
         return keys.map(k => ({
             content: k,

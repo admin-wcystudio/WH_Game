@@ -401,7 +401,7 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
 
         // 2. 確認按鈕 (初始隱藏)
         this.confirmBtn = new CustomButton(scene, 0, 380,
-            'game5_confirm_button', 'game5_confirm_button_select', () => {
+            'confirm_button', 'confirm_button_select', () => {
                 this.checkAnswer();
             });
         this.add(this.confirmBtn);
@@ -501,6 +501,136 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
             this.nextQuestion();
         });
     }
+
+    nextQuestion() {
+        this.currentIndex++;
+        if (this.currentIndex < this.questions.length) {
+            if (this.scene.gameTimer) {
+                this.scene.gameTimer.reset(this.scene.roundPerSeconds);
+                this.scene.gameTimer.start();
+            }
+            this.confirmBtn.setVisible(true);
+            this.selectedAnswerIndex = -1;
+            this.showQuestion();
+        } else {
+            console.log('All questions answered correctly!');
+            this.scene.onRoundWin();
+            if (this.onComplete) this.onComplete();
+            this.destroy(); // 3 題都答完了
+
+        }
+    }
+}
+
+
+export class QuestionPanel_7 extends Phaser.GameObjects.Container {
+    constructor(scene, contents, onComplete) {
+        super(scene, 960, 540);
+        this.scene = scene;
+        this.onComplete = onComplete;
+        this.currentIndex = 0;
+        this.selectedAnswerIndex = -1;
+
+        // Store the questions array
+        this.questions = contents;
+
+        // Create image for displaying question content
+        this.contentImage = scene.add.image(0, 50, '').setDepth(200).setVisible(false);
+        this.add([this.contentImage]);
+
+        // 2. 確認按鈕 (初始隱藏)
+        this.confirmBtn = new CustomButton(scene, 0, 380,
+            'confirm_button', 'confirm_button_select', () => {
+                this.checkAnswer();
+            });
+        this.add(this.confirmBtn);
+
+        this.optionButtons = [];
+        this.showQuestion();
+        scene.add.existing(this);
+    }
+
+    showQuestion() {
+        const q = this.questions[this.currentIndex];
+        this.contentImage.setTexture(q.content).setVisible(true);
+        if (this.optionButtons) {
+            this.optionButtons.forEach(btn => btn.destroy());
+        }
+        this.optionButtons = [];
+
+        const options = q.options || q.option; // Support both 'options' and 'option'
+        options.forEach((optKey, index) => {
+            const y = -50 + index * 170;
+            const btn = new CustomButton(this.scene, 0, y, optKey, `${optKey}_select`,
+                () => {
+                    this.selectedAnswer(btn, index);
+                });
+
+            this.add(btn); // 加入 Container
+            this.optionButtons.push(btn); // 加入陣列追蹤
+        });
+    }
+
+    handleSelect(index) {
+        // Deprecated: use selectedAnswer instead
+        this.selectedAnswer(this.optionButtons[index], index);
+    }
+    selectedAnswer(gameObject, index) {
+        // Clear tint for all buttons
+        this.optionButtons.forEach(btn => btn.clearTint());
+        // Set tint for selected button
+        gameObject.setTint(0xaaaaaa);
+        this.selectedAnswerIndex = index;
+    }
+
+    checkAnswer() {
+        const q = this.questions[this.currentIndex];
+
+        console.log(`Selected: ${this.selectedAnswerIndex}, Correct: ${q.answer}`);
+        if (this.selectedAnswerIndex === q.answer) {
+            if (this.scene.gameTimer) this.scene.gameTimer.stop();
+
+            // 更新 Scene 的圓圈 UI
+            if (this.scene.updateRoundUI) {
+                this.scene.updateRoundUI(true);
+                this.scene.roundIndex++;
+            }
+            // Support both addOn (old) and nextDialog/characterDialog (new) formats
+            const dialogKey = q.addOn || q.nextDialog;
+            if (dialogKey) {
+                this.showAddOn(dialogKey, q.characterDialog);
+            } else {
+                this.nextQuestion();
+            }
+        } else {
+            console.log("答錯了 , correct : " + q.answer);
+            // Hide the question panel to show bubbles properly
+            this.setVisible(false);
+            // Call handleLose which shows fail label, tryagain bubble, and fail panel
+            this.scene.handleLose();
+        }
+    }
+
+    showAddOn(dialogKey, characterDialogKey) {
+        this.optionButtons.forEach(btn => btn.setVisible(false));
+        this.contentImage.setVisible(false);
+        this.confirmBtn.setVisible(false);
+
+        const dialogImg = this.scene.add.image(0, 350, dialogKey).setInteractive({ useHandCursor: true });
+        this.add(dialogImg);
+
+        dialogImg.once('pointerdown', () => {
+            dialogImg.destroy();
+
+            // If there's a character dialogue, show it next
+            if (characterDialogKey) {
+                this.showCharacterDialog(characterDialogKey);
+            } else {
+                this.nextQuestion();
+            }
+        });
+    }
+
 
     nextQuestion() {
         this.currentIndex++;

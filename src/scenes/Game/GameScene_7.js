@@ -1,7 +1,7 @@
 
 import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
-import { CustomPanel, CustomFailPanel, QuestionPanel } from '../../UI/Panel.js';
+import { CustomPanel, CustomFailPanel, QuestionPanel, QuestionPanel_7 } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
 
 export class GameScene_7 extends BaseGameScene {
@@ -22,6 +22,8 @@ export class GameScene_7 extends BaseGameScene {
         // UI buttons
         this.load.image('game7_confirm_button', `${path}game7_confirm_button.png`);
         this.load.image('game7_confirm_button_select', `${path}game7_confirm_button_select.png`);
+        this.load.image('game7_bg', `${path}game7_bg.png`);
+        this.load.image('game7_final_preview', `${path}game7_final_preview.png`);
 
         for (let i = 1; i <= 3; i++) {
             this.load.image(`game7_q${i}`, `${path}game7_q${i}.png`);
@@ -37,7 +39,7 @@ export class GameScene_7 extends BaseGameScene {
         // Pass null for bgKey since using video background
         this.initGame('game7_bg', null, true, true, {
             targetRounds: 3,
-            roundPerSeconds: 60,
+            roundPerSeconds: 600,
             isAllowRoundFail: false,
             isContinuousTimer: true,
             sceneIndex: 7
@@ -71,7 +73,7 @@ export class GameScene_7 extends BaseGameScene {
             }
         ]
 
-        this.questionPanel = new QuestionPanel(this, allQuestions, () => {
+        this.questionPanel = new QuestionPanel_7(this, allQuestions, () => {
         });
         this.questionPanel.setDepth(559).setVisible(false);
     }
@@ -147,5 +149,23 @@ export class GameScene_7 extends BaseGameScene {
             2000, () => {
                 this.showBubble('tryagain');
             });
+    }
+    onWinBubbleClose() {
+        this.questionPanel.setVisible(false);
+        this.showWinGamePreview();
+    }
+
+    showWinGamePreview() {
+        const preview = new CustomPanel(this, 'game7_final_preview', null, null, true);
+        preview.setDepth(560);
+        preview.show();
+        preview.setCloseCallBack(() => {
+            preview.destroy();
+            this.time.delayedCall(
+                2000, () => {
+                    console.log("Game 7 completed, switching to Game Result Scene");
+                    GameManager.switchToGameScene('GameResultScene');
+                });
+        });
     }
 }

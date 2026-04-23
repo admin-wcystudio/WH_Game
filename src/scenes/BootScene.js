@@ -99,6 +99,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('leave_btn', asset_path + 'leave_button.png');
         this.load.image('leave_btn_click', asset_path + 'leave_button_mouseover.png');
 
+        this.load.image('confirm_button', 'assets/images/Game_5/game5_confirm_button.png');
+        this.load.image('confirm_button_select', 'assets/images/Game_5/game5_confirm_button_select.png');
         this.load.image('close_btn', asset_path + 'game1_closebutton.png');
         this.load.image('close_btn_click', asset_path + 'game1_closebutton_select.png');
         this.load.image('fail_chance', asset_path + 'game1_fail.png');
@@ -133,7 +135,7 @@ export class BootScene extends Phaser.Scene {
 
             this.registry.set('globalSettings', settings);
         }
-        this.scene.start('GameResultScene');
+        this.scene.start('GameScene_7');
     }
 }
 

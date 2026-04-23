@@ -42,8 +42,8 @@ export class GameResultScene extends Phaser.Scene {
         this.load.image('program_information_p3', `${path}program_information_p3.png`);
         this.load.image('program_information_p4', `${path}program_information_p4.png`);
 
-        this.load.image('popup_complete', `assets/images/Game_7/game7_popup1.png`);
-        this.load.image('popup_notcomplete', `assets/images/Game_7/game7_popup2.png`);
+        this.load.image('popup_01', `assets/images/Game_7/game7_popup1.png`);
+        this.load.image('popup_02', `assets/images/Game_7/game7_popup2.png`);
 
 
         // Items (1-10)
@@ -173,9 +173,25 @@ export class GameResultScene extends Phaser.Scene {
     }
 
     showGame7Popup(isCompleted) {
-        const popupKey = isCompleted ? 'popup_complete' : 'popup_notcomplete';
         const popup = new CustomPanel(this, 960, 540, [{
-            content: popupKey,
+            content: 'popup_01',
+            closeBtn: 'close_btn',
+            closeBtnClick: 'close_btn_click'
+        }]).setDepth(20);
+        popup.show();
+
+        this.time.delayedCall(
+            2000, () => {
+                popup.destroy();
+                this.showGame7Popup_02();
+            });
+
+    }
+
+
+    showGame7Popup_02() {
+        const popup = new CustomPanel(this, 960, 540, [{
+            content: 'popup_02',
             closeBtn: 'close_btn',
             closeBtnClick: 'close_btn_click'
         }]).setDepth(20);
@@ -183,12 +199,12 @@ export class GameResultScene extends Phaser.Scene {
 
         popup.setCloseCallBack(() => {
             popup.destroy();
-            if (isCompleted) {
-                this.button.setVisible(true);
-            } else {
-                console.log("Game 7 not completed, returning to Game Scene 7");
-                GameManager.switchToGameScene(this, 'GameScene_7');
-            }
+
+            this.time.delayedCall(
+                2000, () => {
+                    console.log("Game 7 not completed, returning to Game Scene 7");
+                    GameManager.switchToGameScene(this, 'GameScene_7');
+                });
         });
     }
 
