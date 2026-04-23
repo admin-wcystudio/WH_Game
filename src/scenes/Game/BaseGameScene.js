@@ -77,6 +77,7 @@ export default class BaseGameScene extends Phaser.Scene {
         const player = JSON.parse(localStorage.getItem('player') || '{"gender":"M"}');
         this.playerGender = player.gender; // Store gender for use in win bubbles
         const descriptionPages = this._formatDescription(descriptionKey);
+        this.descriptionKey = descriptionKey;
 
         this.gameUI = UIHelper.createGameCommonUI(this, bgKey,
             descriptionPages, this.targetRounds, this.config.depthUI);
@@ -453,8 +454,8 @@ export default class BaseGameScene extends Phaser.Scene {
         // 6. Call subclass-specific reset
         this.resetForNewRound();
 
-        // 7. Re-show description panel to restart the flow
-        if (this.gameUI?.descriptionPanel) {
+        // 7. Re-show description panel to restart the flow 
+        if (this.gameUI?.descriptionPanel && this.descriptionKey) {
             this.gameUI.descriptionPanel.show();
             // Set callback to start game when panel is closed (skip intro since already shown)
             this.gameUI.descriptionPanel.setCloseCallBack(() => this.startGame());

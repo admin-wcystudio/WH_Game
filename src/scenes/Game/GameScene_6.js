@@ -321,6 +321,11 @@ export class GameScene_6 extends BaseGameScene {
         this.winVideo = this.add.video(960, 540, 'game6_success_bg').setDepth(30);
         this.winVideo.play(true);
 
+        if (this.sceneIndex > 0) {
+            GameManager.saveGameResult(this.sceneIndex, true, this.totalUsedSeconds);
+            console.log(`遊戲 ${this.sceneIndex} 結束，總用時: ${this.totalUsedSeconds} 秒`);
+        }
+
         this.time.delayedCall(2000, () => {
             this.animDialog_01 = this.add.image(960, dialogY,
                 'game6_npc_box_anim_01').setDepth(31);

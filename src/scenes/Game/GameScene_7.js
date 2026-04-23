@@ -35,7 +35,6 @@ export class GameScene_7 extends BaseGameScene {
     }
 
     create() {
-
         // Pass null for bgKey since using video background
         this.initGame('game7_bg', null, true, true, {
             targetRounds: 3,
@@ -110,15 +109,9 @@ export class GameScene_7 extends BaseGameScene {
         this.updateRoundUI(true);
         this.showFeedbackLabel(true);
 
-        this.video = this.add.video(960, 540, 'game_success')
-            .setDepth(560)
-            .setVisible(true);
-        this.video.setMute(false);
-        this.video.play(true);
-
         this.time.delayedCall(
-            2000, () => {
-                this.showBubble('win', this.playerGender);
+            1000, () => {
+                this.showBubble('win');
             });
 
 
@@ -146,25 +139,31 @@ export class GameScene_7 extends BaseGameScene {
         this.video.play(true);
 
         this.time.delayedCall(
-            2000, () => {
+            1000, () => {
                 this.showBubble('tryagain');
             });
     }
     onWinBubbleClose() {
         this.questionPanel.setVisible(false);
         this.showWinGamePreview();
+
+
     }
 
     showWinGamePreview() {
-        const preview = new CustomPanel(this, 'game7_final_preview', null, null, true);
-        preview.setDepth(560);
+        const preview = new CustomPanel(this, 960, 600, [{
+            content: 'game7_final_preview',
+            closeBtn: 'close_btn',
+            closeBtnClick: 'close_btn_click'
+        }]).setDepth(20);
+        preview.setDepth(2000);
         preview.show();
         preview.setCloseCallBack(() => {
             preview.destroy();
             this.time.delayedCall(
-                2000, () => {
+                1500, () => {
                     console.log("Game 7 completed, switching to Game Result Scene");
-                    GameManager.switchToGameScene('GameResultScene');
+                    GameManager.switchToGameScene(this, 'GameResultScene');
                 });
         });
     }
