@@ -203,7 +203,7 @@ export class GameScene_6 extends BaseGameScene {
 
     spawnArrow() {
         if (!this.fallingArrows) this.fallingArrows = [];
-
+        console.log('Spawning Arrow ');
         const colors = ['blue', 'green', 'red', 'yellow'];
         const gap = 200;
         let startX = 1620;
@@ -214,7 +214,7 @@ export class GameScene_6 extends BaseGameScene {
             startX = Math.max(rightMostArrow.x, 1920);
         }
 
-        console.log('Spawning ');
+
 
         for (let i = 1; i <= 12; i++) {
             const randomIndex = Phaser.Math.Between(0, colors.length - 1);
@@ -350,6 +350,7 @@ export class GameScene_6 extends BaseGameScene {
             this.progressFail.destroy();
             this.progressFail = null;
         }
+        this.canSpawn = true;
     }
 }
 
