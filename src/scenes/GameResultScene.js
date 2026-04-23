@@ -53,8 +53,12 @@ export class GameResultScene extends Phaser.Scene {
     }
 
     create() {
-        this.isGame7Completed = this.allResults['game7']
-            && this.allResults['game7'].completed;
+        // allResults is an array of { game, isFinished, seconds }
+        const game7 = this.allResults.find(r => r.game === 7);
+        this.isGame7Completed = game7 ? !!game7.isFinished : false;
+
+        console.log("Game 7 completed status:", this.isGame7Completed);
+
         const centerX = this.cameras.main.width / 2;
         const centerY = this.cameras.main.height / 2;
 
@@ -122,7 +126,7 @@ export class GameResultScene extends Phaser.Scene {
         const playerName = this.playerInfo ? this.playerInfo.name : "玩家 1";
         this.game.renderer.snapshot((image) => {
             const link = document.createElement('a');
-            link.setAttribute('download', `賣油翁_${playerName}_${new Date().getTime()}.png`);
+            link.setAttribute('download', `為學_${playerName}_${new Date().getTime()}.png`);
             link.setAttribute('href', image.src);
             document.body.appendChild(link);
             link.click();

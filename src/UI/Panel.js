@@ -514,6 +514,9 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
             this.showQuestion();
         } else {
             console.log('All questions answered correctly!');
+            // ensure timing is calculated before triggering round-win flow
+            const isFinalWin = (this.scene.roundIndex + 1 >= this.scene.targetRounds) || this.scene.isAllowRoundFail;
+            if (this.scene._calculateTiming) this.scene._calculateTiming(isFinalWin);
             this.scene.onRoundWin();
             if (this.onComplete) this.onComplete();
             this.destroy(); // 3 題都答完了
@@ -590,6 +593,7 @@ export class QuestionPanel_7 extends Phaser.GameObjects.Container {
         if (this.selectedAnswerIndex === q.answer) {
             if (this.scene.gameTimer) this.scene.gameTimer.stop();
 
+
             // 更新 Scene 的圓圈 UI
             if (this.scene.updateRoundUI) {
                 this.scene.updateRoundUI(true);
@@ -644,6 +648,9 @@ export class QuestionPanel_7 extends Phaser.GameObjects.Container {
             this.showQuestion();
         } else {
             console.log('All questions answered correctly!');
+            // ensure timing is calculated before triggering round-win flow
+            const isFinalWin = (this.scene.roundIndex + 1 >= this.scene.targetRounds) || this.scene.isAllowRoundFail;
+            if (this.scene._calculateTiming) this.scene._calculateTiming(isFinalWin);
             this.scene.onRoundWin();
             if (this.onComplete) this.onComplete();
             this.destroy(); // 3 題都答完了
