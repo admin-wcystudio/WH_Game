@@ -2,8 +2,6 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
-import { use } from 'matter';
-
 
 export class GameScene_6 extends BaseGameScene {
     constructor() {
@@ -185,7 +183,7 @@ export class GameScene_6 extends BaseGameScene {
         });
 
 
-        this.time.delayedCall(2500, () => {
+        this.time.delayedCall(2000, () => {
             if (this.hitPoint) {
                 this.tweens.add({
                     targets: this.hitPoint,
@@ -322,8 +320,8 @@ export class GameScene_6 extends BaseGameScene {
         const dialogY = this.cameras.main.height * 0.8;
         this.winVideo = this.add.video(960, 540, 'game6_success_bg').setDepth(30);
         this.winVideo.play(true);
-        this.winVideo.on('complete', () => {
-            // this.winVideo.destroy();
+
+        this.time.delayedCall(2000, () => {
             this.animDialog_01 = this.add.image(960, dialogY,
                 'game6_npc_box_anim_01').setDepth(31);
 
@@ -346,13 +344,13 @@ export class GameScene_6 extends BaseGameScene {
                                     if (this.animDialog_03) {
                                         this.animDialog_03.destroy();
                                     }
-
-                                    GameManager.switchToGameScene(this, 'GameScene_7');
+                                    GameManager.switchToGameScene(this, 'GameResultScene');
 
                                 });
                         })
                 });
         });
+
     }
 
 

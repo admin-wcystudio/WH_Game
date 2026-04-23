@@ -1,4 +1,5 @@
 import { CustomButton } from "../UI/Button.js";
+import { CustomPanel } from "../UI/Panel.js";
 import UIHelper from "../UI/UIHelper.js";
 import GameManager from "./GameManager.js";
 
@@ -9,6 +10,11 @@ export class GameResultScene extends Phaser.Scene {
 
     preload() {
         const path = 'assets/images/GameEnd/';
+
+        const allResults = GameManager.loadGameResult();
+        const isGame7Completed = allResults['game7'] && allResults['game7'].completed;
+
+        console.log("Game 7 Completed:", isGame7Completed);
 
         // Background
         this.load.image('finishpage_bg', `${path}finishpage_bg.png`);
@@ -38,6 +44,10 @@ export class GameResultScene extends Phaser.Scene {
         this.load.image('finishpage_information2', `${path}finishpage_information_p2.png`);
         this.load.image('program_information_p3', `${path}program_information_p3.png`);
         this.load.image('program_information_p4', `${path}program_information_p4.png`);
+
+        this.load.image('popup_complete', `${path}game7_popup1.png`);
+        this.load.image('popup_notcomplete', `${path}game7_popup2.png`);
+
 
         // Items (1-10)
         for (let i = 1; i <= 10; i++) {
@@ -159,4 +169,20 @@ export class GameResultScene extends Phaser.Scene {
         const itemIndex = Phaser.Math.Between(1, 10);
         return `finishpage_items${itemIndex}`;
     }
+
+    showGame7Popup(isCompleted) {
+        const popupKey = isCompleted ? 'popup_complete' : 'popup_notcomplete';
+        const popup = new CustomPanel(this, 960, 540, popupKey).setDepth(20);
+
+        popup.setCloseCallBack(() => {
+            popup.destroy();
+            if (isCompleted) {
+                this.button.setVisible(true);
+            } else {
+                console.log("Game 7 not completed, returning to Game Scene 7");
+                GameManager.switchToGameScene(this, 'GameSCene_7');
+            }
+        });
+    }
+
 }
