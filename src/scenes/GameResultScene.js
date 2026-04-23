@@ -11,10 +11,7 @@ export class GameResultScene extends Phaser.Scene {
     preload() {
         const path = 'assets/images/GameEnd/';
 
-        const allResults = GameManager.loadGameResult();
-        const isGame7Completed = allResults['game7'] && allResults['game7'].completed;
-
-        console.log("Game 7 Completed:", isGame7Completed);
+        this.allResults = GameManager.loadGameResult();
 
         // Background
         this.load.image('finishpage_bg', `${path}finishpage_bg.png`);
@@ -45,8 +42,8 @@ export class GameResultScene extends Phaser.Scene {
         this.load.image('program_information_p3', `${path}program_information_p3.png`);
         this.load.image('program_information_p4', `${path}program_information_p4.png`);
 
-        this.load.image('popup_complete', `${path}game7_popup1.png`);
-        this.load.image('popup_notcomplete', `${path}game7_popup2.png`);
+        this.load.image('popup_complete', `assets/images/Game_7/game7_popup1.png`);
+        this.load.image('popup_notcomplete', `assets/images/Game_7/game7_popup2.png`);
 
 
         // Items (1-10)
@@ -56,6 +53,8 @@ export class GameResultScene extends Phaser.Scene {
     }
 
     create() {
+        this.isGame7Completed = this.allResults['game7']
+            && this.allResults['game7'].completed;
         const centerX = this.cameras.main.width / 2;
         const centerY = this.cameras.main.height / 2;
 
@@ -77,14 +76,17 @@ export class GameResultScene extends Phaser.Scene {
 
         this.button = new CustomButton(this, centerX, centerY + 150, 'finishpage_item_button', 'finishpage_item_button_select',
             () => {
-                this.button.setVisible(false);
-                if (!this.haveItem) {
-                    const itemKey = this.getRandomItem();
-                    this.itemImage = this.add.image(centerX, centerY + 200, itemKey).setDepth(11);
-                    this.haveItem = true;
-                    this.resultGroup.add(this.itemImage);
+                if (!this.isGame7Completed) {
+                    this.showGame7Popup(this.isGame7Completed);
+                } else {
+                    this.button.setVisible(false);
+                    if (!this.haveItem) {
+                        const itemKey = this.getRandomItem();
+                        this.itemImage = this.add.image(centerX, centerY + 200, itemKey).setDepth(11);
+                        this.haveItem = true;
+                        this.resultGroup.add(this.itemImage);
+                    }
                 }
-
             }).setDepth(11);
         this.resultGroup.add(this.button);
 
@@ -172,7 +174,12 @@ export class GameResultScene extends Phaser.Scene {
 
     showGame7Popup(isCompleted) {
         const popupKey = isCompleted ? 'popup_complete' : 'popup_notcomplete';
-        const popup = new CustomPanel(this, 960, 540, popupKey).setDepth(20);
+        const popup = new CustomPanel(this, 960, 540, [{
+            content: popupKey,
+            closeBtn: 'close_btn',
+            closeBtnClick: 'close_btn_click'
+        }]).setDepth(20);
+        popup.show();
 
         popup.setCloseCallBack(() => {
             popup.destroy();
