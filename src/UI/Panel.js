@@ -456,14 +456,13 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
             }
         } else {
             console.log("答錯了 , correct : " + q.answer);
-
             this.setVisible(false);
-
             this.scene.handleLose();
         }
     }
 
     nextQuestion() {
+        this.scene.onRoundWin();
         this.currentIndex++;
         if (this.currentIndex < this.questions.length) {
             this.confirmBtn.setVisible(true);
@@ -474,7 +473,7 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
             this.destroy(); // 3 題都答完了
 
         }
-        this.scene.onRoundWin();
+
     }
 }
 
@@ -544,69 +543,30 @@ export class QuestionPanel_7 extends Phaser.GameObjects.Container {
 
         console.log(`Selected: ${this.selectedAnswerIndex}, Correct: ${q.answer}`);
         if (this.selectedAnswerIndex === q.answer) {
-            if (this.scene.gameTimer) this.scene.gameTimer.stop();
-
-
-            // 更新 Scene 的圓圈 UI
             if (this.scene.updateRoundUI) {
                 this.scene.updateRoundUI(true);
                 this.scene.roundIndex++;
-            }
-            // Support both addOn (old) and nextDialog/characterDialog (new) formats
-            const dialogKey = q.addOn || q.nextDialog;
-            if (dialogKey) {
-                this.showAddOn(dialogKey, q.characterDialog);
-            } else {
                 this.nextQuestion();
             }
         } else {
             console.log("答錯了 , correct : " + q.answer);
-            // Hide the question panel to show bubbles properly
             this.setVisible(false);
-            // Call handleLose which shows fail label, tryagain bubble, and fail panel
             this.scene.handleLose();
         }
     }
 
-    showAddOn(dialogKey, characterDialogKey) {
-        this.optionButtons.forEach(btn => btn.setVisible(false));
-        this.contentImage.setVisible(false);
-        this.confirmBtn.setVisible(false);
-
-        const dialogImg = this.scene.add.image(0, 350, dialogKey).setInteractive({ useHandCursor: true });
-        this.add(dialogImg);
-
-        dialogImg.once('pointerdown', () => {
-            dialogImg.destroy();
-
-            // If there's a character dialogue, show it next
-            if (characterDialogKey) {
-                this.showCharacterDialog(characterDialogKey);
-            } else {
-                this.nextQuestion();
-            }
-        });
-    }
-
-
     nextQuestion() {
+        this.scene.onRoundWin();
         this.currentIndex++;
         if (this.currentIndex < this.questions.length) {
-            if (this.scene.gameTimer) {
-                this.scene._calculateTiming(false);
-                this.scene.gameTimer.reset(this.scene.roundPerSeconds);
-                this.scene.gameTimer.start();
-            }
             this.confirmBtn.setVisible(true);
             this.selectedAnswerIndex = -1;
             this.showQuestion();
         } else {
             console.log('All questions answered correctly!');
-            // ensure timing is calculated before triggering round-win flow
-            this.scene.onRoundWin();
-            if (this.onComplete) this.onComplete();
             this.destroy(); // 3 題都答完了
 
         }
+
     }
 }

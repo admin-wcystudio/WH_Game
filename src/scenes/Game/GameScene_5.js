@@ -104,10 +104,13 @@ export class GameScene_5 extends BaseGameScene {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
         console.log(`Game 5 = ON ROUND WIN`);
-        let isFinalWin = (this.roundIndex + 1 >= this.targetRounds) || this.isAllowRoundFail;
+        let isFinalWin = (this.roundIndex >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
 
+
         if (isFinalWin) {
+            this.gameTimer.stop();
+            this._calculateTiming(true);
             this.showFeedbackLabel(true);
             this.video = this.add.video(960, 540, 'game_success')
                 .setDepth(560)
@@ -120,7 +123,7 @@ export class GameScene_5 extends BaseGameScene {
                     this.showBubble('win');
                 });
         }
-        this.updateRoundUI(true);
+
 
     }
 
