@@ -19,6 +19,9 @@ const config = {
     title: 'Overlord Rising',
     description: '',
     parent: 'game-container',
+    dom: {
+        createContainer: true
+    },
     width: 1920,
     height: 1080,
     backgroundColor: '#000000',
