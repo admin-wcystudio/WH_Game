@@ -299,15 +299,14 @@ export default class BaseGameScene extends Phaser.Scene {
     }
 
     _calculateTiming(isFinalWin) {
+        console.log('[Timing] Calculating timing for round win...');
         if (!this.gameTimer?.getRemaining) return;
 
         const used = Math.max(0, this.roundPerSeconds - this.gameTimer.getRemaining());
-        if (this.isContinuousTimer) {
-            if (isFinalWin) this.totalUsedSeconds = used;
-        } else {
-            this.totalUsedSeconds += used;
-            this.gameTimer.reset(this.roundPerSeconds);
-        }
+        if (isFinalWin) this.totalUsedSeconds = used;
+        this.totalUsedSeconds += used;
+        console.log(`[Timing] Round ${this.roundIndex + 1} used ${used} seconds, total used: ${this.totalUsedSeconds} seconds`);
+        this.gameTimer.reset(this.roundPerSeconds);
     }
 
     /**
