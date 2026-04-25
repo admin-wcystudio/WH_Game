@@ -4,7 +4,8 @@ export class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.plugin('rexinputtextplugin', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins@1.80.17/dist/rexinputtextplugin.min.js', true);
+        this.load.plugin('rexinputtextplugin',
+            'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins@1.80.17/dist/rexinputtextplugin.min.js', true);
 
         this.load.audio('bgm', 'assets/Music/bgm.mp3');
         // Load assets for the boot scene
@@ -135,7 +136,7 @@ export class BootScene extends Phaser.Scene {
 
             this.registry.set('globalSettings', settings);
         }
-        this.scene.start('GameScene_7');
+        this.scene.start('GameStartScene');
     }
 }
 
