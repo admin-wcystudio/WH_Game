@@ -86,7 +86,7 @@ export class GameScene_6 extends BaseGameScene {
         this.spawnHitPoint = false;
         this.isHitPointValid = false;
         this.isWin = false;
-        this.spawnSpeed = 5;
+        this.spawnSpeed = 4;
         this.currentIndex = 0;
         this.fallingArrows = [];
         this.hitPointTimer = null;
@@ -129,7 +129,7 @@ export class GameScene_6 extends BaseGameScene {
 
 
             if (!this.spawnHitPoint && !this.hitPointTimer) {
-                this.hitPointTimer = this.time.delayedCall(1500, () => {
+                this.hitPointTimer = this.time.delayedCall(2000, () => {
                     this.hitPointTimer = null;
                     if (this.canSpawn && !this.spawnHitPoint) {
                         this.showHitPoint();
@@ -137,7 +137,7 @@ export class GameScene_6 extends BaseGameScene {
                     }
                 });
             }
-            //console.log('Hit point valid:', this.isHitPointValid);
+
 
             for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
                 const arrow = this.fallingArrows[i];
@@ -175,12 +175,24 @@ export class GameScene_6 extends BaseGameScene {
         if (this.isWin || this.spawnHitPoint) return;
 
         this.isHitPointValid = true;
+        // Ensure hitPoint is visible and starts from scale 0 so tween is visible
+        if (this.hitPoint) {
+            this.hitPoint.setVisible(true).setScale(0);
+        }
         this.tweens.add({
             targets: this.hitPoint,
             scale: 1,
             duration: 500,
             ease: 'Back.out'
         });
+
+        // Debug: draw hit zone rectangle for testing
+        // this.clearDebugHitZone();
+        // const debugSize = 160;
+        // this.debugHitRect = this.add.graphics();
+        // this.debugHitRect.lineStyle(2, 0x00ff00, 0.8);
+        // this.debugHitRect.strokeRect(this.hitPoint.x - debugSize / 2, this.hitPoint.y - debugSize / 2, debugSize, debugSize);
+        // this.debugHitRect.setDepth(60);
 
 
         this.time.delayedCall(2000, () => {
@@ -191,6 +203,8 @@ export class GameScene_6 extends BaseGameScene {
                     duration: 500,
                     ease: 'Back.in',
                 });;
+                // remove debug rectangle when hit point hides
+                this.clearDebugHitZone();
             }
             this.time.delayedCall(500, () => {
                 this.isHitPointValid = false;
@@ -200,6 +214,13 @@ export class GameScene_6 extends BaseGameScene {
         this.time.delayedCall(2000, () => {
             this.spawnHitPoint = false;
         });
+    }
+
+    clearDebugHitZone() {
+        if (this.debugHitRect) {
+            try { this.debugHitRect.destroy(); } catch (e) { }
+            this.debugHitRect = null;
+        }
     }
 
     spawnArrow() {
@@ -217,7 +238,7 @@ export class GameScene_6 extends BaseGameScene {
 
 
 
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 15; i++) {
             const randomIndex = Phaser.Math.Between(0, colors.length - 1);
             const color = colors[randomIndex];
             const arrow = this.add.image(startX + (i * gap), 540, `game6_bar_arrow_${color}`).setDepth(24);
@@ -230,18 +251,30 @@ export class GameScene_6 extends BaseGameScene {
     handleArrowClick(index) {
         if (!this.fallingArrows || this.fallingArrows.length === 0) return;
 
-        // Find any arrow that matches the color and is within the hit zone
-        const hitIndex = this.fallingArrows.findIndex(arrow =>
-            arrow.x >= 900 && arrow.x <= 1100 && arrow.colorIndex === index
-        );
+        // Collider-based hit detection: check rectangle overlap between hitPoint and arrows
         let winRound = false;
+        let hitIndex = -1;
+        if (this.isHitPointValid && this.hitPoint && this.fallingArrows && this.fallingArrows.length) {
+            const hitRect = this.hitPoint.getBounds();
+            for (let i = 0; i < this.fallingArrows.length; i++) {
+                const arrow = this.fallingArrows[i];
+                if (arrow.colorIndex !== index) continue;
+                const arrowRect = arrow.getBounds();
+                if (Phaser.Geom.Intersects.RectangleToRectangle(hitRect, arrowRect)) {
+                    hitIndex = i;
+                    break;
+                }
+            }
 
-        if (hitIndex !== -1 && this.isHitPointValid) {
-            const arrow = this.fallingArrows[hitIndex];
-            console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
-            winRound = true;
+            if (hitIndex !== -1) {
+                const arrow = this.fallingArrows[hitIndex];
+                console.log('Hit by overlap matching arrow index:', hitIndex, 'Position:', Math.round(arrow.x));
+                winRound = true;
+            } else {
+                console.log('No overlapping matching arrow. Arrows:', this.fallingArrows.map(a => ({ x: Math.round(a.x), color: a.colorIndex })));
+            }
         } else {
-            // console.log("No matching arrow in hit zone / or hit point not valid");
+            if (!this.isHitPointValid) console.log('Hit attempted but hit point not valid');
         }
 
         // Common cleanup: destroy arrows, hitPoint, and hide barBG
@@ -264,18 +297,15 @@ export class GameScene_6 extends BaseGameScene {
 
             this.roundIndex = this.currentIndex;
             this.onRoundWin();
-            // console.log('Round win! Current index:', this.currentIndex, this.roundIndex);
             this.currentIndex++;
 
-            // Shrink the hit point immediately on win to avoid lingering visuals
             if (this.hitPoint) {
-                this.tweens.add({
-                    targets: this.hitPoint,
-                    scale: 0,
-                    duration: 300,
-                    ease: 'Back.in'
-                });
+
+                try { this.tweens.killTweensOf(this.hitPoint); } catch (e) { }
+                this.hitPoint.setScale(0).setVisible(false);
             }
+            // Clear debug visuals immediately to keep detection in sync
+            //   this.clearDebugHitZone();
         } else {
             this.roundIndex = this.currentIndex;
             this.handleLose();
@@ -388,6 +418,9 @@ export class GameScene_6 extends BaseGameScene {
         if (this.hitPoint) {
             this.hitPoint.setVisible(false).setScale(0);
         }
+
+        // Ensure debug overlay is removed when resetting rounds
+        this.clearDebugHitZone();
 
         if (this.fallingArrows) {
             for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
