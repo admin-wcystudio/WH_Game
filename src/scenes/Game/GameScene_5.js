@@ -151,7 +151,7 @@ export class GameScene_5 extends BaseGameScene {
         this.video.play(true);
 
         this.time.delayedCall(
-            2000, () => {
+            1000, () => {
                 this.showBubble('tryagain');
             });
     }

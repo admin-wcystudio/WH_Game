@@ -56,7 +56,7 @@ export default class UIHelper {
         // 1. Initialize Panels
         const panels = [
             new SettingPanel(scene, 960, 540).setDepth(baseDepth).setScrollFactor(0),
-            new CustomPanel(scene, 960, 540, descriptionPages).setDepth(baseDepth).setScrollFactor(0),
+            descriptionPages ? new CustomPanel(scene, 960, 540, descriptionPages).setDepth(baseDepth).setScrollFactor(0) : null,
             new CustomPanel(scene, 960, 540, programPages).setDepth(baseDepth).setScrollFactor(0)
         ];
 
@@ -84,7 +84,7 @@ export default class UIHelper {
         // UI Setup
         const panels = [
             new SettingPanel(scene, 960, 540).setDepth(this.DEPTH.PANELS).setScrollFactor(0),
-            new CustomPanel(scene, 960, 540, descriptionPages).setDepth(this.DEPTH.PANELS).setScrollFactor(0),
+            descriptionPages ? new CustomPanel(scene, 960, 540, descriptionPages).setDepth(this.DEPTH.PANELS).setScrollFactor(0) : null,
             new ItemsPanel(scene, 960, 540).setDepth(this.DEPTH.PANELS).setScrollFactor(0)
         ];
 
@@ -107,8 +107,8 @@ export default class UIHelper {
         }
 
         return {
-            settingBtn: buttons[0], descBtn: buttons[1], itemBtn: buttons[2], roundStates
-            , descriptionPanel: panels[1]
+            settingBtn: buttons[0], descBtn: buttons[1], itemBtn: buttons[2], roundStates,
+            descriptionPanel: panels[1]
         };
     }
 

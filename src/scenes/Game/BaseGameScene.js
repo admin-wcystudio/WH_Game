@@ -460,10 +460,13 @@ export default class BaseGameScene extends Phaser.Scene {
         this.resetForNewRound();
 
         // 7. Re-show description panel to restart the flow 
-        if (this.gameUI?.descriptionPanel && this.descriptionKey) {
+        if (this.descriptionKey) {
             this.gameUI.descriptionPanel.show();
             // Set callback to start game when panel is closed (skip intro since already shown)
             this.gameUI.descriptionPanel.setCloseCallBack(() => this.startGame());
+        } else {
+            // If there's no description panel (e.g., video background scenes), start immediately
+            this.startGame();
         }
 
         console.log('[Game] Whole game reset - restarting from beginning');
