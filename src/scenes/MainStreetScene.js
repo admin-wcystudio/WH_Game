@@ -177,7 +177,6 @@ export class MainStreetScene extends Phaser.Scene {
             const bg = this.add.image(currentX, 540, key).setOrigin(0, 0.5).setDepth(1);
             currentX += bg.width;
         });
-        //        this.add.image(4150, 600, 'stage_door').setOrigin(0.5, 0.5).setDepth(15);
 
         // 設定相機邊界為總長度 8414px
         this.cameras.main.setBounds(0, 0, 4100, 1080);
@@ -194,15 +193,15 @@ export class MainStreetScene extends Phaser.Scene {
         const ui = UIHelper.createGameCommonUI(this, null, introPage, 0);
 
         // Check if intro has been seen in this session
-        // const hasSeenIntro = sessionStorage.getItem('hasSeenMainStreetIntro');
-        // if (hasSeenIntro) {
-        //     if (ui && ui.descriptionPanel) {
-        //         ui.descriptionPanel.setVisible(false);
-        //     }
-        // } else {
-        //     sessionStorage.setItem('hasSeenMainStreetIntro', 'true');
-        // }
-        //
+        const hasSeenIntro = sessionStorage.getItem('hasSeenMainStreetIntro');
+        if (hasSeenIntro) {
+            if (ui && ui.descriptionPanel) {
+                ui.descriptionPanel.setVisible(false);
+            }
+        } else {
+            sessionStorage.setItem('hasSeenMainStreetIntro', 'true');
+        }
+
         //buttons
         this.isLeftDown = false;
         this.isRightDown = false;

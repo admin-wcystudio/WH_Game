@@ -158,6 +158,7 @@ export default class UIHelper {
             stop: () => timerEvent.paused = true,
             start: () => timerEvent.paused = false,
             reset: (newSeconds) => {
+                console.log(`Timer reset to ${newSeconds} seconds`);
                 timeLeft = newSeconds;
                 timerText.setText(this.#formatTime(timeLeft));
             },

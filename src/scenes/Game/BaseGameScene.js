@@ -303,10 +303,16 @@ export default class BaseGameScene extends Phaser.Scene {
         if (!this.gameTimer?.getRemaining) return;
 
         const used = Math.max(0, this.roundPerSeconds - this.gameTimer.getRemaining());
-        if (isFinalWin) this.totalUsedSeconds = used;
+        console.log(`[Timing] Seconds used this round: ${used}`);
+        // Always accumulate the seconds used for the round.
+        // Previous logic reset to current round when final, then added again,
+        // causing the final round to be counted twice.
         this.totalUsedSeconds += used;
-        console.log(`[Timing] Round ${this.roundIndex + 1} used ${used} seconds, total used: ${this.totalUsedSeconds} seconds`);
-        this.gameTimer.reset(this.roundPerSeconds);
+        console.log(`[Timing] Total seconds used so far: ${this.totalUsedSeconds}`);
+
+        if (!this.isContinuousTimer && !isFinalWin) {
+            this.gameTimer.reset(this.roundPerSeconds);
+        }
     }
 
     /**
