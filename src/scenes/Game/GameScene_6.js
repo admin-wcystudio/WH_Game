@@ -238,7 +238,7 @@ export class GameScene_6 extends BaseGameScene {
 
         if (hitIndex !== -1 && this.isHitPointValid) {
             const arrow = this.fallingArrows[hitIndex];
-            // console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
+            console.log('Hit matching arrow index:', hitIndex, 'Position:', arrow.x);
             winRound = true;
         } else {
             // console.log("No matching arrow in hit zone / or hit point not valid");
@@ -267,6 +267,15 @@ export class GameScene_6 extends BaseGameScene {
             // console.log('Round win! Current index:', this.currentIndex, this.roundIndex);
             this.currentIndex++;
 
+            // Shrink the hit point immediately on win to avoid lingering visuals
+            if (this.hitPoint) {
+                this.tweens.add({
+                    targets: this.hitPoint,
+                    scale: 0,
+                    duration: 300,
+                    ease: 'Back.in'
+                });
+            }
         } else {
             this.roundIndex = this.currentIndex;
             this.handleLose();
@@ -295,12 +304,16 @@ export class GameScene_6 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
+        // Final win if current round (1-based) reaches targetRounds
         let isFinalWin = (this.roundIndex + 1 >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
-        this.gameTimer.stop();
+
         this.enableGameInteraction(false);
 
         if (isFinalWin) {
+            this.canSpawn = false;
+            this._calculateTiming(true);
+            this.gameTimer.stop();
             this.showBubble('win');
             this.showFeedbackLabel(true);
         } else {

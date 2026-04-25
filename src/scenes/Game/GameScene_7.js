@@ -101,22 +101,22 @@ export class GameScene_7 extends BaseGameScene {
     onRoundWin() {
         if (!this.isGameActive || this.gameState === 'gameWin') return;
 
-        let isFinalWin = (this.roundIndex + 1 >= this.targetRounds) || this.isAllowRoundFail;
+        console.log(`Game 7 = ON ROUND WIN`);
+        let isFinalWin = (this.roundIndex >= this.targetRounds);
         this.gameState = isFinalWin ? 'gameWin' : 'roundWin';
 
-        this.gameTimer.stop();
-        this._calculateTiming(isFinalWin);
-        this.enableGameInteraction(false);
-        this.updateRoundUI(true);
-        this.showFeedbackLabel(true);
 
-        this.time.delayedCall(
-            1000, () => {
-                this.showBubble('win');
-            });
-
-
+        if (isFinalWin) {
+            this.gameTimer.stop();
+            this._calculateTiming(true);
+            this.showFeedbackLabel(true);
+            this.time.delayedCall(
+                1000, () => {
+                    this.showBubble('win');
+                });
+        }
     }
+
     handleLose() {
         // Prevent multiple entries
         if (this.gameState === 'gameLose') return;
