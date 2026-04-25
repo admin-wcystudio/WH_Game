@@ -452,13 +452,4 @@ export class GameScene_1 extends BaseGameScene {
     }
 
 
-    showFailPanel() {
-        const popupPanel = new CustomFailPanel(this, 960, 540, () => {
-            popupPanel.destroy();
-            this.restartGame(); // 重新開始整個遊戲
-        }, () => {
-            //GameManager.backToMainStreet(this);
-        });
-        popupPanel.setDepth(1000);
-    }
 }

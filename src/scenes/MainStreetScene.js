@@ -461,70 +461,70 @@ export class MainStreetScene extends Phaser.Scene {
         this.anims.create({
             key: 'npc1_anim',
             frames: this.anims.generateFrameNumbers('npc1', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc1_glow_anim',
             frames: this.anims.generateFrameNumbers('npc1_glow', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc2_anim',
             frames: this.anims.generateFrameNumbers('npc2', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc2_glow_anim',
             frames: this.anims.generateFrameNumbers('npc2_glow', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc3_anim',
             frames: this.anims.generateFrameNumbers('npc3', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc3_glow_anim',
             frames: this.anims.generateFrameNumbers('npc3_glow', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc4_anim',
             frames: this.anims.generateFrameNumbers('npc4', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc4_glow_anim',
             frames: this.anims.generateFrameNumbers('npc4_glow', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc5_anim',
             frames: this.anims.generateFrameNumbers('npc5', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
         this.anims.create({
             key: 'npc5_glow_anim',
             frames: this.anims.generateFrameNumbers('npc5_glow', { start: 0, end: 48 }),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 

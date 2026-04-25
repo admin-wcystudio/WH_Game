@@ -158,6 +158,14 @@ export class GameScene_4 extends BaseGameScene {
 
         for (let i = 0; i < this.snapPositions.length; i++) {
             const pos = this.snapPositions[i];
+            // Skip occupied positions unless it's occupied by the same object (moving within its own slot)
+            if (pos.isOccupied) {
+                const assignedId = this.positionObjects[i];
+                if (!gameObject || assignedId !== gameObject.objectId) {
+                    continue;
+                }
+            }
+
             const distance = Phaser.Math.Distance.Between(x, y, pos.x, pos.y);
             if (distance < minDistance) {
                 minDistance = distance;
