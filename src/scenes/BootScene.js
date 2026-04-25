@@ -7,7 +7,7 @@ export class BootScene extends Phaser.Scene {
         this.load.plugin('rexinputtextplugin',
             'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins@1.80.17/dist/rexinputtextplugin.min.js', true);
 
-        this.load.audio('bgm', 'assets/Music/bgm.mp3');
+        this.load.audio('bgm', 'assets/music/bgm.mp3');
         // Load assets for the boot scene
         const gameStartPath = 'assets/images/GameStart/';
 
