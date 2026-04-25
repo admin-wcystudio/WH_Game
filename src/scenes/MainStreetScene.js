@@ -191,6 +191,7 @@ export class MainStreetScene extends Phaser.Scene {
         ]
 
         const ui = UIHelper.createGameCommonUI(this, null, introPage, 0);
+        ui.descriptionPanel.setVisible(true);
 
         // Check if intro has been seen in this session
         const hasSeenIntro = sessionStorage.getItem('hasSeenMainStreetIntro');
@@ -380,6 +381,13 @@ export class MainStreetScene extends Phaser.Scene {
         }
     }
 
+    switchTalkingAnimation(gender, isLeft) {
+        if (isLeft === undefined) isLeft = this.playerSprite.lastDirectionLeft;
+        let talkKey = isLeft ? `${gender}_left_talk_anim` : `${gender}_right_talk_anim`;
+        this.playerSprite.play(talkKey, true);
+        this.playerSprite.setFlipX(false); // talking animations seem to have dedicated left/right sprites
+    }
+
 
     loadBubble(index = 0, bubbles, sceneKey, targetNpc, characterbubble) {
 
@@ -390,23 +398,6 @@ export class MainStreetScene extends Phaser.Scene {
             this.characterActiveBubble.destroy();
         }
 
-        // Special handling for NPC 5 and 6: Check if Games 1-4 are completed
-        // if (targetNpc.id === 5 || targetNpc.id === 6) {
-        //     const allResults = GameManager.loadGameResult();
-        //     // Check if games 1, 2, 3, and 4 are finished
-        //     const canStartGame = [1, 2, 3, 4].every(num => {
-        //         const res = allResults.find(r => r.game === num);
-        //         return res && res.isFinished;
-        //     });
-
-        //     if (!canStartGame) {
-        //         console.log("Game is locked. Prerequisites (Games 1-4) not met.");
-        //         // Use string arrays directly as the variables are not in scope here
-        //         bubbles = targetNpc.id === 5 ? ['npc5_bubble_reject'] : ['npc6_bubble_reject'];
-        //         sceneKey = null; // Prevent starting the game
-        //     }
-        // }
-
         this.bubbleImg = this.add.image(this.centerX, 900, bubbles[index])
             .setDepth(200)
             .setInteractive({ useHandCursor: true })
@@ -415,6 +406,8 @@ export class MainStreetScene extends Phaser.Scene {
         // 綁定當前 NPC 到對話框，方便 update 檢查距離
         this.bubbleImg.ownerNpc = targetNpc;
         this.currentActiveBubble = this.bubbleImg;
+
+        this.switchTalkingAnimation(this.genderKey, targetNpc.x < this.playerSprite.x);
 
         this.characterBubbleImg = this.add.image(this.centerX, 900, characterbubble)
             .setDepth(200)
