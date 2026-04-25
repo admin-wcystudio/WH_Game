@@ -515,7 +515,7 @@ export class QuestionPanel_7 extends Phaser.GameObjects.Container {
 
         const options = q.options || q.option; // Support both 'options' and 'option'
         options.forEach((optKey, index) => {
-            const y = -50 + index * 170;
+            const y = -50 + index * 120;
             const btn = new CustomButton(this.scene, 0, y, optKey, `${optKey}_select`,
                 () => {
                     this.selectedAnswer(btn, index);
