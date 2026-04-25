@@ -164,8 +164,6 @@ export class MainStreetScene extends Phaser.Scene {
         this.genderKey = gender === 'M' ? 'boy' : 'girl';
         const genderKey = this.genderKey;
 
-        const playerPos = localStorage.getItem('playerPosition') ? JSON.parse(localStorage.getItem('playerPosition')) : { x: 800, y: 550 };
-        this.playerPos = playerPos;
 
 
         console.log(`Player gender: ${gender}, genderKey: ${genderKey}`);
@@ -275,7 +273,14 @@ export class MainStreetScene extends Phaser.Scene {
             });
         });
 
-        this.playerSprite = this.add.sprite(600, 600,
+        const playerPos = localStorage.getItem('playerPosition') ? JSON.parse(localStorage.getItem('playerPosition')) : { x: 800, y: 550 };
+        this.playerPos = playerPos;
+
+        // Start player at saved position (clamped to camera bounds)
+        const startX = Phaser.Math.Clamp(this.playerPos.x ?? 800, 600, 3800);
+        const startY = this.playerPos.y ?? 600;
+
+        this.playerSprite = this.add.sprite(startX, startY,
             `${genderKey}_idle`).setDepth(14).setScale(2);
 
         this.playerSprite.anims.play(`${genderKey}_idle_anim`);
