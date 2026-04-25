@@ -39,7 +39,7 @@ export class GameScene_7 extends BaseGameScene {
         // Pass null for bgKey since using video background
         this.initGame('game7_bg', null, true, true, {
             targetRounds: 3,
-            roundPerSeconds: 600,
+            roundPerSeconds: 60,
             isAllowRoundFail: false,
             isContinuousTimer: true,
             sceneIndex: 7
