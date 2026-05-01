@@ -42,6 +42,7 @@ export class GameResultScene extends Phaser.Scene {
         this.load.image('program_information_p3', `${path}program_information_p3.png`);
         this.load.image('program_information_p4', `${path}program_information_p4.png`);
 
+        this.load.image('dialogue', `assets/images/Game_7/game7_npc_box1.png`);
         this.load.image('popup_01', `assets/images/Game_7/game7_popup1.png`);
         this.load.image('popup_02', `assets/images/Game_7/game7_popup2.png`);
         this.load.image('receive_button', `assets/images/Game_7/game7_receive_button.png`);
@@ -82,17 +83,18 @@ export class GameResultScene extends Phaser.Scene {
 
         this.button = new CustomButton(this, centerX, centerY + 150, 'finishpage_item_button', 'finishpage_item_button_select',
             () => {
-                if (!this.isGame7Completed) {
-                    this.showGame7Popup(this.isGame7Completed);
-                } else {
-                    this.button.setVisible(false);
-                    if (!this.haveItem) {
-                        const itemKey = this.getRandomItem();
-                        this.itemImage = this.add.image(centerX, centerY + 200, itemKey).setDepth(11);
-                        this.haveItem = true;
-                        this.resultGroup.add(this.itemImage);
-                    }
+                this.button.setVisible(false);
+                if (!this.haveItem) {
+                    const itemKey = this.getRandomItem();
+                    this.itemImage = this.add.image(centerX, centerY + 200, itemKey).setDepth(11);
+                    this.haveItem = true;
+                    this.resultGroup.add(this.itemImage);
                 }
+
+                if (!this.isGame7Completed) {
+                    this.showDialogue();
+                }
+
             }).setDepth(11);
         this.resultGroup.add(this.button);
 
@@ -122,6 +124,17 @@ export class GameResultScene extends Phaser.Scene {
             }).setDepth(11).setVisible(true);
         this.resultGroup.add(this.closeButton);
 
+    }
+
+    showDialogue() {
+
+        const dialogY = this.cameras.main.height * 0.85;
+        this.dialogue = this.add.image(960, dialogY, 'dialogue').setDepth(20).setInteractive({ useHandCursor: true });
+
+        this.dialogue.on('pointerdown', () => {
+            this.dialogue.destroy();
+            this.showGame7Popup(this.isGame7Completed);
+        });
     }
 
     takeScreenshot() {
@@ -187,23 +200,12 @@ export class GameResultScene extends Phaser.Scene {
                         2000, () => {
                             popup.destroy();
                             receiveButton.destroy();
-                            this.showGame7Popup_02();
+                            console.log("Game 7 not completed, returning to Game Scene 7");
+                            GameManager.switchToGameScene(this, 'GameScene_7');
                         });
                 });
         receiveButton.setDepth(21);
 
-    }
-
-    showGame7Popup_02() {
-        const popup = this.add.image(960, 540, 'popup_02').setDepth(20);
-        popup.setVisible(true);
-
-        this.time.delayedCall(
-            3000, () => {
-                popup.destroy();
-                console.log("Game 7 not completed, returning to Game Scene 7");
-                GameManager.switchToGameScene(this, 'GameScene_7');
-            });
     }
 
 }

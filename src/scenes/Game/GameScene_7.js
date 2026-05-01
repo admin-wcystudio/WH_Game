@@ -13,11 +13,7 @@ export class GameScene_7 extends BaseGameScene {
 
         const path = 'assets/images/Game_7/';
 
-        this.load.image('game7_npc_box_win', `${path}game7_npc_box1.png`);
-        this.load.image('game7_npc_box_tryagain', `${path}game7_npc_box2.png`);
-
-        this.load.video('game_success', `${path}game7_success_bg.mp4`);
-        this.load.video('game_fail', `${path}game7_fail_bg.mp4`);
+        this.load.image('game7_npc_box_win', `${path}game7_npc_box2.png`);
 
         // UI buttons
         this.load.image('game7_confirm_button', `${path}game7_confirm_button.png`);
@@ -32,6 +28,8 @@ export class GameScene_7 extends BaseGameScene {
             this.load.image(`game7_q${i}_a_button_select`, `${path}game7_q${i}_a_button_select.png`);
             this.load.image(`game7_q${i}_b_button_select`, `${path}game7_q${i}_b_button_select.png`);
         }
+
+        this.load.image('popup_fail', `assets/images/Game_7/game7_popup2.png`);
     }
 
     create() {
@@ -129,21 +127,23 @@ export class GameScene_7 extends BaseGameScene {
 
         this.label = this.add.image(1650, 350, 'game_fail_label').setDepth(555);
         if (this.gameTimer) this.gameTimer.stop();
-        this.enableGameInteraction(false);
         this.updateRoundUI(false);
+        this.enableGameInteraction(false);
 
-
-        this.video = this.add.video(960, 540, 'game_fail')
-            .setDepth(560)
-            .setVisible(true);
-        this.video.setMute(false);
-        this.video.play(true);
-
-        this.time.delayedCall(
-            1000, () => {
-                this.showBubble('tryagain');
-            });
+        this.showFail();
     }
+
+    showFail() {
+        this.popup = this.add.image(960, 540, 'popup_fail').setDepth(40);
+        this.popup.setInteractive({ useHandCursor: true });
+
+        this.popup.on('pointerdown', () => {
+            this.popup.destroy();
+            this.showLose();
+        });
+
+    }
+
     onWinBubbleClose() {
         this.questionPanel.setVisible(false);
         this.showWinGamePreview();
