@@ -67,7 +67,7 @@ export class GameScene_6 extends BaseGameScene {
 
         this.barBG = this.add.image(960, 540, 'game6_bar_bg').setDepth(20);
         this.progressBar = this.add.image(960, 950, 'game6_progress_bar').setDepth(21);
-        this.progressIcon = this.add.image(960, 950, 'game6_progress_icon').setDepth(24);
+        this.progressIcon = this.add.image(600, 950, 'game6_progress_icon').setDepth(24);
         this.hitPoint = this.add.image(1000, 520, 'game6_hit_point').setDepth(30)
             .setVisible(false).setScale(0);
 
@@ -142,6 +142,9 @@ export class GameScene_6 extends BaseGameScene {
             for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
                 const arrow = this.fallingArrows[i];
                 arrow.x -= this.spawnSpeed;
+                if (!arrow.visible && arrow.x <= 1620) {
+                    arrow.setVisible(true);
+                }
                 if (arrow.x < 200) {
                     arrow.destroy();
                     this.fallingArrows.splice(i, 1);
@@ -228,21 +231,26 @@ export class GameScene_6 extends BaseGameScene {
         //console.log('Spawning Arrow ');
         const colors = ['blue', 'green', 'red', 'yellow'];
         const gap = 200;
-        let startX = 1620;
+        let startX;
 
         if (this.fallingArrows.length > 0) {
             const rightMostArrow = this.fallingArrows.reduce((
                 max, arrow) => arrow.x > max.x ? arrow : max, this.fallingArrows[0]);
-            startX = Math.max(rightMostArrow.x, 1920);
+            startX = Math.max(rightMostArrow.x, 1620);
+        } else {
+            startX = 800; // initial spawn starts inside the visible bar
         }
 
 
 
+        const BAR_RIGHT_X = 1620;
         for (let i = 1; i <= 15; i++) {
             const randomIndex = Phaser.Math.Between(0, colors.length - 1);
             const color = colors[randomIndex];
-            const arrow = this.add.image(startX + (i * gap), 540, `game6_bar_arrow_${color}`).setDepth(24);
+            const arrowX = startX + (i * gap);
+            const arrow = this.add.image(arrowX, 540, `game6_bar_arrow_${color}`).setDepth(24);
             arrow.colorIndex = randomIndex;
+            arrow.setVisible(arrowX <= BAR_RIGHT_X);
             this.fallingArrows.push(arrow);
         }
 
@@ -328,6 +336,11 @@ export class GameScene_6 extends BaseGameScene {
         const successWidth = Math.floor(this.progressWidth * Math.min(1, this.currentIndex / this.targetRounds));
         this.progressSuccess.setCrop(0, 0, successWidth, this.progressSuccess.height);
         this.progressFail.setCrop(0, 0, showFail ? this.progressWidth : 0, this.progressFail.height);
+
+        if (this.progressIcon) {
+            const barLeftX = 960 - this.progressWidth / 2;
+            this.progressIcon.x = barLeftX + successWidth;
+        }
     }
 
 
@@ -439,6 +452,10 @@ export class GameScene_6 extends BaseGameScene {
         if (this.progressFail) {
             this.progressFail.destroy();
             this.progressFail = null;
+        }
+        if (this.progressIcon) {
+            const barLeftX = this.progressWidth ? 960 - this.progressWidth / 2 : 600;
+            this.progressIcon.x = barLeftX;
         }
         this.canSpawn = true;
     }

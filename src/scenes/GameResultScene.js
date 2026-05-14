@@ -67,6 +67,7 @@ export class GameResultScene extends Phaser.Scene {
 
 
         this.ui = UIHelper.createResultCommonUI(this);
+
         this.haveItem = false;
 
         // Background
@@ -121,7 +122,7 @@ export class GameResultScene extends Phaser.Scene {
 
                 });
 
-            }).setDepth(11).setVisible(true);
+            }).setDepth(11).setVisible(this.isGame7Completed);
         this.resultGroup.add(this.closeButton);
 
     }
