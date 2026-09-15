@@ -3,6 +3,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel, QuestionPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 export class GameScene_5 extends BaseGameScene {
     constructor() {
@@ -12,6 +13,7 @@ export class GameScene_5 extends BaseGameScene {
     preload() {
 
         const path = 'assets/images/Game_5/';
+        VoiceOverHelper.preload(this);
 
         this.load.image('game5_npc_box_win', `${path}game5_npc_box4.png`);
         this.load.image('game5_npc_box_tryagain', `${path}game5_npc_box5.png`);

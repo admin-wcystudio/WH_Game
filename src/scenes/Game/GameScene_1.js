@@ -3,6 +3,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel, QuestionPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 export class GameScene_1 extends BaseGameScene {
     constructor() {
@@ -12,6 +13,7 @@ export class GameScene_1 extends BaseGameScene {
     preload() {
 
         const path = 'assets/images/Game_1/';
+        VoiceOverHelper.preload(this);
 
         this.width = this.cameras.main.width;
         this.height = this.cameras.main.height;
@@ -431,8 +433,10 @@ export class GameScene_1 extends BaseGameScene {
             targetContent?.descriptionDialog)
             .setDepth(300)
             .setInteractive({ useHandCursor: true });
+        VoiceOverHelper.playBubbleVo(this, targetContent?.descriptionDialog);
 
         this.descriptionDialog.once('pointerdown', () => {
+            VoiceOverHelper.stop(this);
             this.descriptionDialog.destroy();
 
             this.resetForNewRound();

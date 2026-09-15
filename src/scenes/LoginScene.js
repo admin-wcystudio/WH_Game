@@ -1,6 +1,7 @@
 import { CustomButton } from '../UI/Button.js';
 import { CustomPanel, SettingPanel } from '../UI/Panel.js';
 import UIHelper from '../UI/UIHelper.js';
+import VoiceOverHelper from '../Audio/VoiceOverHelper.js';
 
 export class LoginScene extends Phaser.Scene {
     constructor() {
@@ -51,6 +52,7 @@ export class LoginScene extends Phaser.Scene {
         this.bgVideo.setMute(false);
 
         this.bgVideo.play(true); // loop
+        VoiceOverHelper.ensureBgm(this);
 
         const descriptionPages = [
             {

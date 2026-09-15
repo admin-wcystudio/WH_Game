@@ -2,6 +2,7 @@ import { CustomButton } from "../UI/Button.js";
 import { CustomPanel } from "../UI/Panel.js";
 import UIHelper from "../UI/UIHelper.js";
 import GameManager from "./GameManager.js";
+import VoiceOverHelper from "../Audio/VoiceOverHelper.js";
 
 export class GameResultScene extends Phaser.Scene {
     constructor() {
@@ -43,6 +44,7 @@ export class GameResultScene extends Phaser.Scene {
         this.load.image('program_information_p4', `${path}program_information_p4.png`);
 
         this.load.image('dialogue', `assets/images/Game_7/game7_npc_box1.png`);
+        VoiceOverHelper.preload(this);
         this.load.image('popup_01', `assets/images/Game_7/game7_popup1.png`);
         this.load.image('popup_02', `assets/images/Game_7/game7_popup2.png`);
         this.load.image('receive_button', `assets/images/Game_7/game7_receive_button.png`);
@@ -56,6 +58,9 @@ export class GameResultScene extends Phaser.Scene {
     }
 
     create() {
+        VoiceOverHelper.ensureBgm(this);
+        this.events.once('shutdown', () => VoiceOverHelper.stop(this));
+
         // allResults is an array of { game, isFinished, seconds }
         const game7 = this.allResults.find(r => r.game === 7);
         this.isGame7Completed = game7 ? !!game7.isFinished : false;
@@ -104,6 +109,9 @@ export class GameResultScene extends Phaser.Scene {
             , 'finishpage_close_button_select', () => {
                 if (this.itemImage == null) return; // Ensure the item has been revealed before allowing to close
 
+                VoiceOverHelper.stop(this, { restoreBgm: false });
+                VoiceOverHelper.stopBgm(this);
+
                 this.takeScreenshot();
 
                 this.time.delayedCall(5000, () => {
@@ -131,8 +139,10 @@ export class GameResultScene extends Phaser.Scene {
 
         const dialogY = this.cameras.main.height * 0.85;
         this.dialogue = this.add.image(960, dialogY, 'dialogue').setDepth(20).setInteractive({ useHandCursor: true });
+        VoiceOverHelper.playBubbleVo(this, 'dialogue');
 
         this.dialogue.on('pointerdown', () => {
+            VoiceOverHelper.stop(this);
             this.dialogue.destroy();
             this.showGame7Popup(this.isGame7Completed);
         });

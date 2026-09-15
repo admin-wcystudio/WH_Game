@@ -1,4 +1,5 @@
 import { CustomButton, CustomButton2 } from './Button.js';
+import VoiceOverHelper from '../Audio/VoiceOverHelper.js';
 /**
  * BASE PANEL CLASS
  * Provides common functionality for all game overlays
@@ -126,7 +127,7 @@ export class SettingPanel extends Phaser.GameObjects.Container {
         const settings = savedData ? JSON.parse(savedData) : { volume: 3, language: 'HK' };
 
         this.currentVolume = settings.volume;
-        this.currentLanguage = settings.language;
+        this.currentLanguage = settings.language === 'CN' ? 'CN' : 'HK';
         this.volumeCells = [];
 
         // 2. Build UI
@@ -157,9 +158,17 @@ export class SettingPanel extends Phaser.GameObjects.Container {
             this.volumeCells.push(cell);
         }
 
-        // Language Section
-        this.mandarinBtn = new CustomButton2(this.scene, -50, 50, 'lang_mandarin', 'lang_mandarin_click', () => this.setLanguage('CN'));
-        this.cantoneseBtn = new CustomButton2(this.scene, 300, 50, 'lang_cantonese', 'lang_cantonese_click', () => this.setLanguage('HK'));
+        // Language Section — radio: exactly one of Putonghua / Cantonese is always selected
+        this.mandarinBtn = new CustomButton2(
+            this.scene, -50, 50, 'lang_mandarin', 'lang_mandarin_click',
+            () => this.setLanguage('CN'),
+            () => this.setLanguage('CN')
+        );
+        this.cantoneseBtn = new CustomButton2(
+            this.scene, 300, 50, 'lang_cantonese', 'lang_cantonese_click',
+            () => this.setLanguage('HK'),
+            () => this.setLanguage('HK')
+        );
 
         this.mandarinBtn.needClicked = true;
         this.cantoneseBtn.needClicked = true;
@@ -185,6 +194,7 @@ export class SettingPanel extends Phaser.GameObjects.Container {
 
         // Immediate feedback: Update global sound volume
         this.scene.sound.volume = this.currentVolume * 0.2;
+        this.persistSettings();
     }
 
     updateVolumeDisplay() {
@@ -194,9 +204,13 @@ export class SettingPanel extends Phaser.GameObjects.Container {
     }
 
     setLanguage(lang) {
-        if (this.currentLanguage === lang) return; // Skip if no change
-        this.currentLanguage = lang;
+        const next = (lang === 'CN') ? 'CN' : 'HK';
+        const changed = this.currentLanguage !== next;
+        this.currentLanguage = next;
         this.refreshLanguageUI();
+        if (!changed) return;
+        this.persistSettings();
+        VoiceOverHelper.replayCurrent(this.scene);
     }
 
     refreshLanguageUI() {
@@ -211,12 +225,16 @@ export class SettingPanel extends Phaser.GameObjects.Container {
         !isMandarin ? this.cantoneseBtn.setPressedState() : this.cantoneseBtn.setNormalState();
     }
 
-    saveToLocal() {
-        const settings = {
+    persistSettings() {
+        localStorage.setItem('gameSettings', JSON.stringify({
             volume: this.currentVolume,
-            language: this.currentLanguage
-        };
-        localStorage.setItem('gameSettings', JSON.stringify(settings));
+            language: this.currentLanguage === 'CN' ? 'CN' : 'HK'
+        }));
+    }
+
+    saveToLocal() {
+        this.persistSettings();
+        VoiceOverHelper.replayCurrent(this.scene);
         this.hide();
     }
 

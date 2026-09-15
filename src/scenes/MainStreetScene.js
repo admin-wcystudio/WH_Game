@@ -3,6 +3,7 @@ import UIHelper from '../UI/UIHelper.js';
 import { CustomPanel, SettingPanel } from '../UI/Panel.js';
 import NpcHelper from '../Character/NpcHelper.js';
 import GameManager from './GameManager.js';
+import VoiceOverHelper from '../Audio/VoiceOverHelper.js';
 
 export class MainStreetScene extends Phaser.Scene {
     constructor() {
@@ -73,6 +74,8 @@ export class MainStreetScene extends Phaser.Scene {
         this.load.image('stage3', 'assets/images/MainStreet/stage3.png');
         this.load.image('gameintro_01', 'assets/images/MainStreet/gameintro.png');
         this.load.image('gametimer', 'assets/images/MainStreet/gameintro_timer.png');
+
+        VoiceOverHelper.preload(this);
 
         this.load.image('npc1_bubble_1', 'assets/images/Game_4/game4_npc_box1.png');
 
@@ -152,6 +155,8 @@ export class MainStreetScene extends Phaser.Scene {
     create() {
         // Create NPC animations
         this.createAnimations();
+        this.events.once('shutdown', () => VoiceOverHelper.stop(this));
+        VoiceOverHelper.ensureBgm(this);
 
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
@@ -336,6 +341,7 @@ export class MainStreetScene extends Phaser.Scene {
                     this.bubbleTimers = [];
 
                     // 2. Destroy NPC Bubble
+                    VoiceOverHelper.stop(this);
                     if (this.currentActiveBubble) {
                         this.currentActiveBubble.destroy();
                         this.currentActiveBubble = null;
@@ -411,6 +417,7 @@ export class MainStreetScene extends Phaser.Scene {
         // 綁定當前 NPC 到對話框，方便 update 檢查距離
         this.bubbleImg.ownerNpc = targetNpc;
         this.currentActiveBubble = this.bubbleImg;
+        VoiceOverHelper.playBubbleVo(this, bubbles[index]);
 
         this.switchTalkingAnimation(this.genderKey, targetNpc.x < this.playerSprite.x);
 
@@ -436,6 +443,7 @@ export class MainStreetScene extends Phaser.Scene {
 
             this.time.delayedCall(500, () => {
                 if (sceneKey && targetNpc.canInteract) {
+                    VoiceOverHelper.stop(this);
                     localStorage.setItem('playerPosition', JSON.stringify({ x: this.playerSprite.x, y: this.playerSprite.y }));
                     GameManager.switchToGameScene(this, sceneKey);
                 }

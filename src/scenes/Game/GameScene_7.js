@@ -3,6 +3,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel, QuestionPanel, QuestionPanel_7 } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 export class GameScene_7 extends BaseGameScene {
     constructor() {
@@ -12,6 +13,7 @@ export class GameScene_7 extends BaseGameScene {
     preload() {
 
         const path = 'assets/images/Game_7/';
+        VoiceOverHelper.preload(this);
 
         this.load.image('game7_npc_box_win', `${path}game7_npc_box2.png`);
 
@@ -136,8 +138,10 @@ export class GameScene_7 extends BaseGameScene {
     showFail() {
         this.popup = this.add.image(960, 540, 'popup_fail').setDepth(40);
         this.popup.setInteractive({ useHandCursor: true });
+        VoiceOverHelper.playBubbleVo(this, 'popup_fail');
 
         this.popup.on('pointerdown', () => {
+            VoiceOverHelper.stop(this);
             this.popup.destroy();
             this.showLose();
         });

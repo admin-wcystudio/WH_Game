@@ -2,6 +2,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 export class GameScene_6 extends BaseGameScene {
     constructor() {
@@ -10,6 +11,7 @@ export class GameScene_6 extends BaseGameScene {
 
     preload() {
         const path = 'assets/images/Game_6/';
+        VoiceOverHelper.preload(this);
         const player = JSON.parse(localStorage.getItem('player') || '{"gender":"M"}');
         this.genderKey = player.gender === 'M' ? 'boy' : 'girl';
 
@@ -385,6 +387,7 @@ export class GameScene_6 extends BaseGameScene {
         this.time.delayedCall(2000, () => {
             this.animDialog_01 = this.add.image(960, dialogY,
                 'game6_npc_box_anim_01').setDepth(31);
+            VoiceOverHelper.playBubbleVo(this, 'game6_npc_box_anim_01');
 
             this.animDialog_01.setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
@@ -393,6 +396,7 @@ export class GameScene_6 extends BaseGameScene {
                     }
                     this.animDialog_02 = this.add.image(960, dialogY,
                         'game6_npc_box_anim_02').setDepth(31);
+                    VoiceOverHelper.playBubbleVo(this, 'game6_npc_box_anim_02');
                     this.animDialog_02.setInteractive({ useHandCursor: true })
                         .on('pointerdown', () => {
                             if (this.animDialog_02) {
@@ -400,6 +404,7 @@ export class GameScene_6 extends BaseGameScene {
                             }
                             this.animDialog_03 = this.add.image(960, dialogY,
                                 'game6_npc_box_anim_03').setDepth(31);
+                            VoiceOverHelper.playBubbleVo(this, 'game6_npc_box_anim_03');
                             this.animDialog_03.setInteractive({ useHandCursor: true })
                                 .on('pointerdown', () => {
                                     if (this.animDialog_03) {

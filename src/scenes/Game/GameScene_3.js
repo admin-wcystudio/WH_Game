@@ -2,6 +2,7 @@ import BaseGameScene from './BaseGameScene.js';
 import { CustomButton } from '../../UI/Button.js';
 import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
 import GameManager from '../GameManager.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 
 export class GameScene_3 extends BaseGameScene {
@@ -11,6 +12,7 @@ export class GameScene_3 extends BaseGameScene {
 
     preload() {
         const path = 'assets/images/Game_3/';
+        VoiceOverHelper.preload(this);
 
         this.width = this.cameras.main.width;
         this.height = this.cameras.main.height;

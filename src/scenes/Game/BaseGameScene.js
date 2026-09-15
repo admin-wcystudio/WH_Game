@@ -2,6 +2,7 @@ import { CustomButton } from '../../UI/Button.js';
 import UIHelper from '../../UI/UIHelper.js';
 import GameManager from '../GameManager.js';
 import { CustomPanel, CustomFailPanel } from '../../UI/Panel.js';
+import VoiceOverHelper from '../../Audio/VoiceOverHelper.js';
 
 /**
  * Enhanced BaseGameScene
@@ -73,6 +74,8 @@ export default class BaseGameScene extends Phaser.Scene {
         this.gameState = 'init';
         this.roundIndex = 0;
         this.totalUsedSeconds = 0;
+        this.events.once('shutdown', () => VoiceOverHelper.stop(this));
+        VoiceOverHelper.ensureBgm(this);
 
         const player = JSON.parse(localStorage.getItem('player') || '{"gender":"M"}');
         this.playerGender = player.gender; // Store gender for use in win bubbles
@@ -149,6 +152,7 @@ export default class BaseGameScene extends Phaser.Scene {
             .setDepth(this.config.depthBubble)
             .setScrollFactor(0)
             .setInteractive({ useHandCursor: true });
+        VoiceOverHelper.playBubbleVo(this, targetKey);
         this.tweens.add({
             targets: this.currentBubbleImg,
             scale: { from: 0.5, to: 1 },
@@ -159,6 +163,7 @@ export default class BaseGameScene extends Phaser.Scene {
         const closeBubble = () => {
             if (closed) return;
             closed = true;
+            VoiceOverHelper.stop(this);
             if (this.currentBubbleImg) {
                 this.currentBubbleImg.destroy();
                 this.currentBubbleImg = null;
@@ -432,6 +437,7 @@ export default class BaseGameScene extends Phaser.Scene {
         this._setupTimer();
 
         // 3. Clear bubbles and feedback labels
+        VoiceOverHelper.stop(this);
         if (this.currentBubbleImg) {
             this.currentBubbleImg.destroy();
             this.currentBubbleImg = null;
@@ -527,6 +533,7 @@ export default class BaseGameScene extends Phaser.Scene {
      * Cleans up the scene to prevent memory leaks
      */
     shutdown() {
+        VoiceOverHelper.stop(this);
         if (this.gameTimer) this.gameTimer.stop();
         this.tweens.killAll();
         this.events.off('game-start');
