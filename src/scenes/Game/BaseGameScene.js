@@ -254,9 +254,19 @@ export default class BaseGameScene extends Phaser.Scene {
 
     _handleEntryFlow(skip, auto, gender) {
         const startAction = () => {
-            if (skip && auto) this.startGame();
-            else if (skip) this.gameUI.descriptionPanel?.setCloseCallBack(() => this.startGame());
-            else this.gameUI.descriptionPanel?.setCloseCallBack(() => this.showBubble('intro', gender));
+            if (skip && auto) {
+                this.startGame();
+            } else if (skip) {
+                if (this.gameUI.descriptionPanel) {
+                    this.gameUI.descriptionPanel.setCloseCallBack(() => this.startGame());
+                } else {
+                    this.startGame();
+                }
+            } else if (this.gameUI.descriptionPanel) {
+                this.gameUI.descriptionPanel.setCloseCallBack(() => this.showBubble('intro', gender));
+            } else {
+                this.showBubble('intro', gender);
+            }
         };
         startAction();
     }

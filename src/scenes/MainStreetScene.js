@@ -78,13 +78,19 @@ export class MainStreetScene extends Phaser.Scene {
         VoiceOverHelper.preload(this);
 
         this.load.image('npc1_bubble_1', 'assets/images/Game_4/game4_npc_box1.png');
+        this.load.image('game4_npc_box1', 'assets/images/Game_4/game4_npc_box1.png');
 
         this.load.image('npc2_bubble_1', 'assets/images/Game_2/game2_npc_box1.png');
         this.load.image('npc2_bubble_2', 'assets/images/Game_2/game2_npc_box2.png');
+        this.load.image('game2_npc_box1', 'assets/images/Game_2/game2_npc_box1.png');
+        this.load.image('game2_npc_box2', 'assets/images/Game_2/game2_npc_box2.png');
 
         this.load.image('npc3_bubble_1', 'assets/images/Game_3/game3_npc_box1.png');
+        this.load.image('game3_npc_box1', 'assets/images/Game_3/game3_npc_box1.png');
         this.load.image('npc4_bubble_1', 'assets/images/Game_1/game1_npc_box1.png');
-        this.load.image('npc5_bubble_1', 'assets/images/Game_5/game5_npc_box1.png');
+        this.load.image('game1_npc_box1', 'assets/images/Game_1/game1_npc_box1.png');
+        this.load.image('game5_npc_box2', 'assets/images/Game_5/game5_npc_box2.png');
+        this.load.image('game5_npc_box3', 'assets/images/Game_5/game5_npc_box3.png');
         this.load.image('npc6_bubble_1', 'assets/images/Game_6/game6_npc_box1.png');
 
 
@@ -235,11 +241,11 @@ export class MainStreetScene extends Phaser.Scene {
 
 
         this.bubbleTimers = [];
-        const npc1_bubbles = ['npc1_bubble_1'];
-        const npc2_bubbles = ['npc2_bubble_1', 'npc2_bubble_2'];
-        const npc3_bubbles = ['npc3_bubble_1'];
-        const npc4_bubbles = ['npc4_bubble_1'];
-        const npc5_bubbles = ['npc5_bubble_1'];
+        const npc1_bubbles = VoiceOverHelper.getStreetLines(4);
+        const npc2_bubbles = VoiceOverHelper.getStreetLines(2);
+        const npc3_bubbles = VoiceOverHelper.getStreetLines(3);
+        const npc4_bubbles = VoiceOverHelper.getStreetLines(1);
+        const npc5_bubbles = VoiceOverHelper.getStreetLines(5);
 
         // NPCs (trigger game)
         this.interactiveNpcs = [];
@@ -271,9 +277,11 @@ export class MainStreetScene extends Phaser.Scene {
             npc.on('pointerdown', () => {
                 if (npc.canInteract) {
                     const gameNumber = npcGameMap[npc.id] ?? (index + 1);
-                    const sceneKey = `GameScene_${gameNumber}`;
+                    const locked = gameNumber === 5 && !VoiceOverHelper.arePrereqsMet(5);
+                    const lines = VoiceOverHelper.getStreetLines(gameNumber, locked);
+                    const sceneKey = locked ? null : `GameScene_${gameNumber}`;
                     const characterbubble = `game${gameNumber}_${genderKey}_bubble`;
-                    this.loadBubble(0, npc.bubbles, sceneKey, npc, characterbubble);
+                    this.loadBubble(0, lines, sceneKey, npc, characterbubble);
                 }
             });
         });

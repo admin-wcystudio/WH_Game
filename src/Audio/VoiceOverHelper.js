@@ -1,3 +1,6 @@
+import GameManager from '../scenes/GameManager.js';
+import { gameConfig } from '../config.js';
+
 export default class VoiceOverHelper {
     static FADE_MS = 200;
     static BGM_VOLUME = 0.32;
@@ -34,7 +37,8 @@ export default class VoiceOverHelper {
             fail: 'game4_npc_box3'
         },
         5: {
-            street: ['game5_npc_box1'],
+            streetLock: ['game5_npc_box2'],
+            street: ['game5_npc_box3'],
             intro: [],
             win: 'game5_npc_box4',
             fail: 'game5_npc_box5'
@@ -47,9 +51,8 @@ export default class VoiceOverHelper {
             winFinal: ['game6_npc_box5', 'game6_npc_box6', 'game6_npc_box7']
         },
         7: {
-            intro: [],
+            intro: ['game7_npc_box1'],
             win: 'game7_npc_box2',
-            afterQuestions: 'game7_npc_box1',
             fail: 'game7_popup2'
         }
     };
@@ -102,8 +105,10 @@ export default class VoiceOverHelper {
         npc2_bubble_2: 'game2_npc_box2',
         npc3_bubble_1: 'game3_npc_box1',
         npc4_bubble_1: 'game1_npc_box1',
-        npc5_bubble_1: 'game5_npc_box1',
+        npc5_bubble_1: 'game5_npc_box3',
+        npc5_bubble_lock: 'game5_npc_box2',
         npc6_bubble_1: 'game6_npc_box1',
+        game7_npc_box_intro: 'game7_npc_box1',
         game1_npc_box_mainstreet_01: 'game1_npc_box1',
         game1_npc_box_win: 'game1_npc_box8',
         game1_npc_box_tryagain: 'game1_npc_box9',
@@ -158,9 +163,21 @@ export default class VoiceOverHelper {
         });
     }
 
-    static getStreetLines(gameId) {
+    static getStreetLines(gameId, locked = false) {
         const config = VoiceOverHelper.GAME_DIALOGUE[gameId];
-        return config?.street || [];
+        if (!config) return [];
+        if (locked && config.streetLock) return config.streetLock;
+        return config.street || [];
+    }
+
+    static arePrereqsMet(gameId) {
+        if (gameConfig.isTesting) return true;
+        const results = GameManager.loadGameResult();
+        const needed = gameId === 5 ? [1, 2, 3, 4] : [];
+        return needed.every((n) => {
+            const res = results.find((r) => r.game === n);
+            return res && res.isFinished;
+        });
     }
 
     static getLanguageSuffix() {

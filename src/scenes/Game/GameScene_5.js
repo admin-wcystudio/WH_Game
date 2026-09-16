@@ -97,7 +97,7 @@ export class GameScene_5 extends BaseGameScene {
         this.questionPanel.setVisible(false);
         this.time.delayedCall(
             1500, () => {
-                console.log("Game 5 completed, switching to Game Result Scene");
+                console.log("Game 5 completed, switching to Game 6");
                 GameManager.switchToGameScene(this, 'GameScene_6');
             });
     }

@@ -15,6 +15,7 @@ export class GameScene_7 extends BaseGameScene {
         const path = 'assets/images/Game_7/';
         VoiceOverHelper.preload(this);
 
+        this.load.image('game7_npc_box_intro', `${path}game7_npc_box1.png`);
         this.load.image('game7_npc_box_win', `${path}game7_npc_box2.png`);
 
         // UI buttons
@@ -37,7 +38,7 @@ export class GameScene_7 extends BaseGameScene {
     create() {
 
         // Pass null for bgKey since using video background
-        this.initGame('game7_bg', null, true, true, {
+        this.initGame('game7_bg', null, false, false, {
             targetRounds: 3,
             roundPerSeconds: 60,
             isAllowRoundFail: false,
