@@ -69,7 +69,7 @@ export class GameScene_6 extends BaseGameScene {
 
         this.barBG = this.add.image(960, 540, 'game6_bar_bg').setDepth(20);
         this.progressBar = this.add.image(960, 950, 'game6_progress_bar').setDepth(21);
-        this.progressIcon = this.add.image(600, 950, 'game6_progress_icon').setDepth(24);
+        this.progressIcon = this.add.image(1320, 950, 'game6_progress_icon').setDepth(24);
         this.hitPoint = this.add.image(1000, 520, 'game6_hit_point').setDepth(30)
             .setVisible(false).setScale(0);
 
@@ -336,12 +336,12 @@ export class GameScene_6 extends BaseGameScene {
         }
 
         const successWidth = Math.floor(this.progressWidth * Math.min(1, this.currentIndex / this.targetRounds));
-        this.progressSuccess.setCrop(0, 0, successWidth, this.progressSuccess.height);
+        this.progressSuccess.setCrop(this.progressWidth - successWidth, 0, successWidth, this.progressSuccess.height);
         this.progressFail.setCrop(0, 0, showFail ? this.progressWidth : 0, this.progressFail.height);
 
         if (this.progressIcon) {
-            const barLeftX = 960 - this.progressWidth / 2;
-            this.progressIcon.x = barLeftX + successWidth;
+            const barRightX = 960 + this.progressWidth / 2;
+            this.progressIcon.x = barRightX - successWidth;
         }
     }
 
@@ -459,8 +459,8 @@ export class GameScene_6 extends BaseGameScene {
             this.progressFail = null;
         }
         if (this.progressIcon) {
-            const barLeftX = this.progressWidth ? 960 - this.progressWidth / 2 : 600;
-            this.progressIcon.x = barLeftX;
+            const barRightX = this.progressWidth ? 960 + this.progressWidth / 2 : 1320;
+            this.progressIcon.x = barRightX;
         }
         this.canSpawn = true;
     }
