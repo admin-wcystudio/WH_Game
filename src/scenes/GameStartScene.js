@@ -2,6 +2,7 @@ import { CustomButton } from '../UI/Button.js';
 import { CustomPanel, SettingPanel } from '../UI/Panel.js';
 import UIHelper from '../UI/UIHelper.js';
 import VoiceOverHelper from '../Audio/VoiceOverHelper.js';
+import GameManager from './GameManager.js';
 
 export class GameStartScene extends Phaser.Scene {
     constructor() {
@@ -14,6 +15,7 @@ export class GameStartScene extends Phaser.Scene {
         localStorage.removeItem('allGamesResult');
         localStorage.removeItem('playerPosition');
         localStorage.removeItem('hasSeenMainStreetIntro');
+        GameManager.clearSessionClock();
 
         VoiceOverHelper.ensureBgm(this);
 
